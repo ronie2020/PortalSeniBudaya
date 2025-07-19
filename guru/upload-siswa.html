@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Daftar Siswa - Portal Guru</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Kita akan menggunakan library yang sama seperti saat export Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style> body { font-family: 'Inter', sans-serif; } </style>
+</head>
+<body class="bg-gray-100">
+
+    <div class="flex h-screen bg-gray-100">
+        <!-- Sidebar -->
+        <div class="hidden md:flex flex-col w-64 bg-white shadow-lg">
+            <div class="flex items-center justify-center h-20 shadow-md">
+               <a href="../index.html" class="text-2xl font-bold text-indigo-600">Portal Guru</a>
+            </div>
+            <nav class="flex-1 px-4 py-4 space-y-2">
+                <a href="dashboard-guru.html" class="flex items-center px-4 py-2 text-gray-600 hover:bg-indigo-100 hover:text-indigo-600 rounded-lg">
+                    <!-- Icon Dashboard --> Dashboard
+                </a>
+                <a href="manajemen-pengumuman.html" class="flex items-center px-4 py-2 text-gray-600 hover:bg-indigo-100 hover:text-indigo-600 rounded-lg">
+                    <!-- Icon Pengumuman --> Manajemen Pengumuman
+                </a>
+                <a href="manajemen-materi.html" class="flex items-center px-4 py-2 text-gray-600 hover:bg-indigo-100 hover:text-indigo-600 rounded-lg">
+                    <!-- Icon Materi --> Manajemen Materi
+                </a>
+                <a href="manajemen-latihan.html" class="flex items-center px-4 py-2 text-gray-600 hover:bg-indigo-100 hover:text-indigo-600 rounded-lg">
+                    <!-- Icon Latihan --> Manajemen Latihan
+                </a>
+                <a href="rekap-nilai.html" class="flex items-center px-4 py-2 text-gray-600 hover:bg-indigo-100 hover:text-indigo-600 rounded-lg">
+                    <!-- Icon Rekap Nilai --> Rekap Nilai
+                </a>
+                <a href="daftar-siswa.html" class="flex items-center px-4 py-2 text-white bg-indigo-600 rounded-lg">
+                    <!-- Icon Daftar Siswa --> Daftar Siswa
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex flex-col flex-1 overflow-y-auto">
+            <!-- Header -->
+            <div class="flex items-center justify-between h-20 bg-white shadow-md px-6 sticky top-0">
+                <div class="text-2xl font-semibold text-gray-800">Upload Daftar Siswa</div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-gray-600">Selamat datang, <span id="display-name" class="font-semibold">Memuat...</span></span>
+                    <button id="logout-button" class="text-sm text-red-500 hover:text-red-700 font-semibold">Logout</button>
+                </div>
+            </div>
+            
+            <!-- Content Area -->
+            <div class="p-6">
+                <div class="bg-white p-8 rounded-lg shadow space-y-6 max-w-4xl mx-auto">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900">Instruksi Upload</h3>
+                        <p class="mt-2 text-sm text-gray-600">
+                            Untuk mendaftarkan banyak siswa sekaligus, silakan siapkan file Excel (.xlsx) atau CSV (.csv) dengan format kolom yang tepat.
+                        </p>
+                    </div>
+
+                    <div class="border-t pt-4">
+                        <h4 class="font-semibold text-gray-800">Format Kolom yang Dibutuhkan:</h4>
+                        <p class="text-sm text-gray-500">Pastikan baris pertama di file Anda adalah header dengan nama kolom persis seperti di bawah ini (huruf kecil semua):</p>
+                        <div class="mt-2 p-3 bg-gray-100 rounded-md text-sm font-mono">
+                            nama_lengkap, username, kelas, email, password
+                        </div>
+                    </div>
+
+                    <div class="border-t pt-4">
+                        <h4 class="font-semibold text-gray-800">Langkah 1: Pilih File</h4>
+                        <input type="file" id="file-input" accept=".xlsx, .csv" class="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"/>
+                    </div>
+
+                    <div class="border-t pt-4 flex justify-end">
+                        <button id="process-button" class="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 font-semibold">
+                            Proses dan Daftarkan Siswa
+                        </button>
+                    </div>
+
+                    <!-- Area untuk menampilkan hasil proses -->
+                    <div id="result-area" class="hidden border-t pt-4">
+                        <h4 class="font-semibold text-gray-800">Hasil Proses:</h4>
+                        <div id="result-log" class="mt-2 p-4 bg-gray-50 rounded-md text-sm max-h-60 overflow-y-auto"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script type="module">
+        import { supabase } from '../js/supabase-client.js';
+
+        const displayNameElement = document.getElementById('display-name');
+        const logoutButton = document.getElementById('logout-button');
+        const fileInput = document.getElementById('file-input');
+        const processButton = document.getElementById('process-button');
+        const resultArea = document.getElementById('result-area');
+        const resultLog = document.getElementById('result-log');
+
+        processButton.addEventListener('click', async () => {
+            const file = fileInput.files[0];
+            if (!file) {
+                alert("Silakan pilih file terlebih dahulu.");
+                return;
+            }
+
+            processButton.disabled = true;
+            processButton.textContent = 'Memproses...';
+            resultArea.classList.remove('hidden');
+            resultLog.innerHTML = '<p>Membaca file...</p>';
+
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                const data = new Uint8Array(event.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const sheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[sheetName];
+                const studentList = XLSX.utils.sheet_to_json(worksheet);
+
+                if (studentList.length === 0) {
+                    resultLog.innerHTML = '<p class="text-red-500">File kosong atau format tidak sesuai.</p>';
+                    processButton.disabled = false;
+                    processButton.textContent = 'Proses dan Daftarkan Siswa';
+                    return;
+                }
+
+                resultLog.innerHTML = `<p>Ditemukan ${studentList.length} siswa. Memulai proses pendaftaran...</p>`;
+                
+                let successCount = 0;
+                let errorCount = 0;
+
+                // Simpan sesi guru saat ini
+                const { data: { session: guruSession } } = await supabase.auth.getSession();
+
+                for (const student of studentList) {
+                    const { nama_lengkap, username, kelas, email } = student;
+                    // **PERBAIKAN DI SINI: Mengubah password menjadi string**
+                    const password = String(student.password);
+                    
+                    // Validasi data dasar
+                    if (!nama_lengkap || !email || !password) {
+                        resultLog.innerHTML += `<p class="text-red-500">- Gagal: Data tidak lengkap untuk ${email || 'salah satu baris'}.</p>`;
+                        errorCount++;
+                        continue;
+                    }
+
+                    // Daftarkan akun login
+                    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({ email, password });
+
+                    if (signUpError) {
+                        resultLog.innerHTML += `<p class="text-red-500">- Gagal mendaftarkan ${email}: ${signUpError.message}</p>`;
+                        errorCount++;
+                    } else {
+                        // Pulihkan sesi guru sebelum insert ke tabel users
+                        await supabase.auth.setSession(guruSession);
+                        
+                        // Tambahkan profil ke tabel users
+                        const { error: profileError } = await supabase.from('users').insert({
+                            id: signUpData.user.id,
+                            nama_lengkap,
+                            username,
+                            kelas,
+                            role: 'siswa'
+                        });
+
+                        if (profileError) {
+                             resultLog.innerHTML += `<p class="text-red-500">- Gagal menyimpan profil untuk ${email}: ${profileError.message}</p>`;
+                             errorCount++;
+                        } else {
+                            resultLog.innerHTML += `<p class="text-green-500">- Berhasil mendaftarkan ${email}.</p>`;
+                            successCount++;
+                        }
+                    }
+                }
+
+                resultLog.innerHTML += `<hr class="my-2"><p class="font-bold">Proses Selesai! Berhasil: ${successCount}, Gagal: ${errorCount}.</p>`;
+                processButton.disabled = false;
+                processButton.textContent = 'Proses dan Daftarkan Siswa';
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        async function initializePage() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                window.location.href = '/login.html';
+                return;
+            }
+            const { data: profile } = await supabase.from('users').select('nama_lengkap').eq('id', user.id).single();
+            if (profile) {
+                displayNameElement.textContent = profile.nama_lengkap;
+            }
+        }
+
+        logoutButton.addEventListener('click', async () => {
+            await supabase.auth.signOut();
+            window.location.href = '/login.html';
+        });
+
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+</body>
+</html>

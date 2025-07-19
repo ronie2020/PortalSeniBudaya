@@ -56,6 +56,13 @@
         <!-- PERUBAHAN DI SINI: Menggunakan grid untuk menampung materi dan latihan -->
         <div class="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-8">
             <!-- Materi Terbaru -->
+            <section class="mt-16">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-8">Pengumuman Terbaru</h2>
+            <div id="recent-pengumuman-list" class="max-w-4xl mx-auto space-y-4">
+                <!-- Pengumuman akan dimuat di sini -->
+                <p id="loading-pengumuman" class="text-gray-500 text-center">Memuat pengumuman...</p>
+            </div>
+            </section>
             <section>
                 <h2 class="text-3xl font-bold text-center text-gray-900 mb-8">Materi Terbaru</h2>
                 <div id="recent-materi-list" class="space-y-4">
@@ -93,6 +100,8 @@
         const loadingMateri = document.getElementById('loading-materi');
         const recentLatihanList = document.getElementById('recent-latihan-list');
         const loadingLatihan = document.getElementById('loading-latihan');
+         const recentPengumumanList = document.getElementById('recent-pengumuman-list');
+        const loadingPengumuman = document.getElementById('loading-pengumuman');
 
         // Fungsi untuk mengambil statistik publik
         async function fetchPublicStats() {
@@ -134,6 +143,7 @@
                 recentMateriList.innerHTML = '<p class="text-gray-500 text-center">Belum ada materi yang tersedia.</p>';
             }
 
+
             // Ambil 3 latihan terbaru
             const { data: latihan, error: latihanError } = await supabase
                 .from('latihan')
@@ -157,6 +167,41 @@
                 });
             } else {
                 recentLatihanList.innerHTML = '<p class="text-gray-500 text-center">Belum ada latihan yang tersedia.</p>';
+            }
+        }
+
+          async function fetchRecentAnnouncements() {
+            // Ambil 3 pengumuman terbaru yang ditujukan untuk semua kelas (kelas is null)
+            const { data, error } = await supabase
+                .from('pengumuman')
+                .select('judul, isi, created_at')
+                .is('kelas', null)
+                .order('created_at', { ascending: false })
+                .limit(3);
+
+            loadingPengumuman.style.display = 'none';
+            recentPengumumanList.innerHTML = '';
+
+            if (error) {
+                console.error("Error fetching announcements:", error);
+                recentPengumumanList.innerHTML = '<p class="text-red-500 text-center">Gagal memuat pengumuman.</p>';
+                return;
+            }
+
+            if (data && data.length > 0) {
+                data.forEach(item => {
+                    const tgl = new Date(item.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+                    const card = document.createElement('div');
+                    card.className = 'bg-white border-l-4 border-blue-500 p-4 rounded-r-lg shadow-sm';
+                    card.innerHTML = `
+                        <h3 class="font-bold text-blue-800">${item.judul}</h3>
+                        <p class="text-xs text-gray-500 mb-2">Diposting pada ${tgl}</p>
+                        <p class="text-gray-700 whitespace-pre-wrap">${item.isi}</p>
+                    `;
+                    recentPengumumanList.appendChild(card);
+                });
+            } else {
+                recentPengumumanList.innerHTML = '<p class="text-gray-500 text-center">Tidak ada pengumuman saat ini.</p>';
             }
         }
 
@@ -190,6 +235,7 @@
             // Muat data publik
             await fetchPublicStats();
             await fetchRecentItems();
+            await fetchRecentAnnouncements();
         }
 
         document.addEventListener('DOMContentLoaded', initializePage);

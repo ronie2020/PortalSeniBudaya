@@ -30,7 +30,7 @@
     <main class="container mx-auto px-6 py-12">
         <!-- Navigation Tabs -->
         <div class="mb-8 border-b border-gray-200">
-           <nav class="flex justify-center space-x-8" aria-label="Tabs">
+            <nav class="flex justify-center space-x-8" aria-label="Tabs">
                 <a href="dashboard-siswa.html" class="pb-4 px-1 font-medium text-indigo-600 border-b-2 border-indigo-500 whitespace-nowrap" aria-current="page">Dashboard</a>
                 <a href="materi-siswa.html" class="pb-4 px-1 text-gray-500 hover:text-indigo-600 hover:border-indigo-500 whitespace-nowrap">Materi Pembelajaran</a>
                 <a href="tugas-siswa.html" class="pb-4 px-1 text-gray-500 hover:text-indigo-600 hover:border-indigo-500 whitespace-nowrap">Tugas & Latihan</a>
@@ -42,6 +42,14 @@
         <section class="mb-10">
             <h1 id="welcome-message" class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Memuat...</h1>
             <p class="text-lg text-gray-600">Selamat belajar dan tetap semangat mengerjakan tugas-tugasmu.</p>
+        </section>
+
+        <!-- Pengumuman -->
+        <section id="pengumuman-section" class="mb-10">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Pengumuman Terbaru</h2>
+            <div id="pengumuman-list" class="space-y-4">
+                <p class="text-gray-500">Memuat pengumuman...</p>
+            </div>
         </section>
 
         <!-- Dynamic Content Grid -->
@@ -73,14 +81,47 @@
         const logoutButton = document.getElementById('logout-button');
         const tugasListContainer = document.getElementById('tugas-list');
         const materiListContainer = document.getElementById('materi-list');
+        const pengumumanListContainer = document.getElementById('pengumuman-list');
         
         let currentUser = null;
         let userProfile = null;
 
-        // Fungsi untuk mengambil dan menampilkan data dashboard
-        async function populateDashboard() {
-            if (!userProfile) return;
+        // Fungsi untuk mengambil pengumuman
+        async function fetchAnnouncements() {
+            const { data, error } = await supabase
+                .from('pengumuman')
+                .select('*')
+                .or(`kelas.eq.${userProfile.kelas},kelas.is.null`)
+                .order('created_at', { ascending: false })
+                .limit(3); 
 
+            pengumumanListContainer.innerHTML = '';
+            if (error) {
+                console.error("Error fetching announcements:", error);
+                pengumumanListContainer.innerHTML = '<p class="text-red-500">Gagal memuat pengumuman.</p>';
+                return;
+            }
+
+            if (data && data.length > 0) {
+                data.forEach(item => {
+                    const tgl = new Date(item.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+                    const card = document.createElement('div');
+                    card.className = 'bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg';
+                    card.innerHTML = `
+                        <h3 class="font-bold text-blue-800">${item.judul}</h3>
+                        <p class="text-xs text-gray-500 mb-2">Diposting pada ${tgl} - Untuk Kelas: ${item.kelas || 'Semua'}</p>
+                        <p class="text-gray-700 whitespace-pre-wrap">${item.isi}</p>
+                    `;
+                    pengumumanListContainer.appendChild(card);
+                });
+            } else {
+                // Sembunyikan seluruh bagian pengumuman jika tidak ada
+                document.getElementById('pengumuman-section').style.display = 'none';
+            }
+        }
+
+        // **PERBAIKAN DI SINI: Mengisi kembali fungsi populateDashboard**
+        async function populateDashboard() {
             // --- Ambil Tugas yang Belum Dikerjakan ---
             const { data: hasilSiswa } = await supabase
                 .from('hasil_latihan')
@@ -93,7 +134,7 @@
                 .from('latihan')
                 .select('*')
                 .or(`kelas.eq.${userProfile.kelas},kelas.is.null`)
-                .order('batas_waktu', { ascending: true, nullsFirst: false }) // Prioritaskan yang ada batas waktu
+                .order('batas_waktu', { ascending: true, nullsFirst: false })
                 .limit(5);
 
             if (latihanError) console.error("Error fetching latihan:", latihanError);
@@ -184,6 +225,8 @@
             displayNameElement.textContent = userProfile.nama_lengkap;
             welcomeMessageElement.textContent = `Halo, ${userProfile.username}!`;
 
+            // Panggil semua fungsi untuk memuat data
+            await fetchAnnouncements();
             await populateDashboard();
         }
 
