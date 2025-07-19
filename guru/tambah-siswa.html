@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tambah Siswa - Portal Seni Budaya</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <div class="flex h-screen bg-gray-100">
+        <!-- Sidebar (Sama seperti di dashboard) -->
+        <div class="hidden md:flex flex-col w-64 bg-white shadow-lg">
+            <div class="flex items-center justify-center h-20 shadow-md">
+                <h1 class="text-2xl font-bold text-indigo-600">Portal Guru</h1>
+            </div>
+            <nav class="flex-1 px-4 py-4 space-y-2">
+                <a href="dashboard-guru.html" class="flex items-center px-4 py-2 text-gray-600 hover:bg-indigo-100 hover:text-indigo-600 rounded-lg transition duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+                    Dashboard
+                </a>
+                <a href="manajemen-materi.html" class="flex items-center px-4 py-2 text-gray-600 hover:bg-indigo-100 hover:text-indigo-600 rounded-lg transition duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                    Manajemen Materi
+                </a>
+                <a href="manajemen-latihan.html" class="flex items-center px-4 py-2 text-gray-600 hover:bg-indigo-100 hover:text-indigo-600 rounded-lg transition duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
+                    Manajemen Latihan
+                </a>
+                <a href="#" class="flex items-center px-4 py-2 text-gray-600 hover:bg-indigo-100 hover:text-indigo-600 rounded-lg transition duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                    Rekap Nilai
+                </a>
+                <a href="daftar-siswa.html" class="flex items-center px-4 py-2 text-white bg-indigo-600 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                    Daftar Siswa
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex flex-col flex-1 overflow-y-auto">
+            <!-- Header -->
+            <div class="flex items-center justify-between h-20 bg-white shadow-md px-6">
+                <div class="text-2xl font-semibold text-gray-800">Tambah Siswa Baru</div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-gray-600">Selamat datang, <span id="display-name" class="font-semibold">Memuat...</span></span>
+                    <button id="logout-button" class="text-sm text-red-500 hover:text-red-700 font-semibold">Logout</button>
+                </div>
+            </div>
+            
+            <!-- Content Area: Form Tambah Siswa -->
+            <div class="p-6">
+                <form id="add-student-form" class="bg-white p-8 rounded-lg shadow space-y-6">
+                    <p class="text-sm text-gray-600">Halaman ini akan membuat akun login baru untuk siswa dan menambahkannya ke daftar siswa.</p>
+                    <div>
+                        <label for="nama_lengkap" class="block text-sm font-medium text-gray-700">Nama Lengkap Siswa</label>
+                        <input type="text" id="nama_lengkap" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+                        <input type="text" id="username" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700">Email Siswa (untuk login)</label>
+                        <input type="email" id="email" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="kelas" class="block text-sm font-medium text-gray-700">Kelas</label>
+                        <input type="text" id="kelas" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Contoh: 9 A">
+                    </div>
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                        <input type="password" id="password" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" minlength="6">
+                        <p class="text-xs text-gray-500 mt-1">Minimal 6 karakter.</p>
+                    </div>
+
+                    <div id="error-message" class="text-red-600 text-sm"></div>
+                    <div id="success-message" class="text-green-600 text-sm"></div>
+
+
+                    <div class="flex justify-end space-x-4">
+                        <a href="daftar-siswa.html" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Batal</a>
+                        <button type="submit" id="submit-button" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 font-semibold">Simpan Siswa</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script type="module">
+        import { supabase } from '../js/supabase-client.js';
+
+        const displayNameElement = document.getElementById('display-name');
+        const logoutButton = document.getElementById('logout-button');
+        const addStudentForm = document.getElementById('add-student-form');
+        const errorMessage = document.getElementById('error-message');
+        const successMessage = document.getElementById('success-message');
+        const submitButton = document.getElementById('submit-button');
+        let currentGuruSession = null;
+
+        // Fungsi untuk menangani penambahan siswa baru
+        addStudentForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            errorMessage.textContent = '';
+            successMessage.textContent = '';
+            submitButton.disabled = true;
+            submitButton.textContent = 'Menyimpan...';
+
+            // Langkah 1: Simpan sesi guru saat ini
+            const { data: { session: guruSession } } = await supabase.auth.getSession();
+            if (!guruSession) {
+                alert("Sesi Anda tidak valid. Harap login kembali.");
+                window.location.href = '/login.html';
+                return;
+            }
+
+            const namaLengkap = addStudentForm.nama_lengkap.value;
+            const username = addStudentForm.username.value;
+             const kelas = addStudentForm.kelas.value;
+            const email = addStudentForm.email.value;
+            const password = addStudentForm.password.value;
+
+            // Langkah 2: Daftarkan siswa baru. Ini akan otomatis login sebagai siswa.
+            const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+                email: email,
+                password: password,
+            });
+
+            if (signUpError) {
+                console.error('Error signing up user:', signUpError);
+                errorMessage.textContent = 'Gagal membuat akun login: ' + signUpError.message;
+                submitButton.disabled = false;
+                submitButton.textContent = 'Simpan Siswa';
+                return;
+            }
+
+            // Langkah 3: Tambahkan profil siswa ke tabel 'users'.           
+            await supabase.auth.setSession(guruSession);
+
+            const newUser = signUpData.user;
+            const { error: profileError } = await supabase
+                .from('users')
+                .insert({
+                    id: newUser.id,
+                    nama_lengkap: namaLengkap,
+                    username: username,
+                    kelas: kelas,
+                    role: 'siswa'
+                });
+
+            if (profileError) {
+                console.error('Error creating profile:', profileError);
+                errorMessage.textContent = 'Gagal menyimpan profil siswa: ' + profileError.message;               
+            } else {
+                successMessage.textContent = 'Siswa berhasil ditambahkan! Anda bisa menambahkan siswa lainnya.';
+                addStudentForm.reset(); // Kosongkan form untuk input berikutnya
+            }
+            
+            submitButton.disabled = false;
+            submitButton.textContent = 'Simpan Siswa';
+        });
+
+        // Fungsi utama untuk inisialisasi halaman
+        async function initializePage() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                window.location.href = '/login.html';
+                return;
+            }
+            const { data: profile } = await supabase.from('users').select('nama_lengkap').eq('id', user.id).single();
+            if (profile) {
+                displayNameElement.textContent = profile.nama_lengkap;
+            }
+        }
+
+        logoutButton.addEventListener('click', async () => {
+            await supabase.auth.signOut();
+            window.location.href = '/login.html';
+        });
+
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+</body>
+</html>

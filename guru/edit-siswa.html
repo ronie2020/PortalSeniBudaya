@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Siswa - Portal Guru</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style> body { font-family: 'Inter', sans-serif; } </style>
+</head>
+<body class="bg-gray-100">
+
+    <div class="flex h-screen bg-gray-100">
+        <!-- Sidebar -->
+        <div class="hidden md:flex flex-col w-64 bg-white shadow-lg">
+            <div class="flex items-center justify-center h-20 shadow-md">
+                <h1 class="text-2xl font-bold text-indigo-600">Portal Guru</h1>
+            </div>
+            <nav class="flex-1 px-4 py-4 space-y-2">
+                <a href="dashboard-guru.html" class="flex items-center px-4 py-2 text-gray-600 hover:bg-indigo-100 hover:text-indigo-600 rounded-lg">
+                    <!-- Icon Dashboard --> Dashboard
+                </a>
+                <a href="manajemen-materi.html" class="flex items-center px-4 py-2 text-gray-600 hover:bg-indigo-100 hover:text-indigo-600 rounded-lg">
+                    <!-- Icon Materi --> Manajemen Materi
+                </a>
+                <a href="manajemen-latihan.html" class="flex items-center px-4 py-2 text-gray-600 hover:bg-indigo-100 hover:text-indigo-600 rounded-lg">
+                    <!-- Icon Latihan --> Manajemen Latihan
+                </a>
+                <a href="rekap-nilai.html" class="flex items-center px-4 py-2 text-gray-600 hover:bg-indigo-100 hover:text-indigo-600 rounded-lg">
+                    <!-- Icon Rekap Nilai --> Rekap Nilai
+                </a>
+                <a href="daftar-siswa.html" class="flex items-center px-4 py-2 text-white bg-indigo-600 rounded-lg">
+                    <!-- Icon Daftar Siswa --> Daftar Siswa
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex flex-col flex-1 overflow-y-auto">
+            <!-- Header -->
+            <div class="flex items-center justify-between h-20 bg-white shadow-md px-6 sticky top-0">
+                <div class="text-2xl font-semibold text-gray-800">Edit Siswa</div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-gray-600">Selamat datang, <span id="display-name" class="font-semibold">Memuat...</span></span>
+                    <button id="logout-button" class="bg-red-500 text-white py-2 px-4 rounded-lg text-sm font-semibold hover:bg-red-600 transition duration-300">Logout</button>
+                </div>
+            </div>
+            
+            <!-- Content Area: Form Edit Siswa -->
+            <div class="p-6">
+                <form id="edit-student-form" class="bg-white p-8 rounded-lg shadow space-y-6">
+                    <p id="loading-form" class="text-gray-500">Memuat data siswa...</p>
+                    <div id="form-content" class="hidden space-y-6">
+                        <div>
+                            <label for="nama_lengkap" class="block text-sm font-medium text-gray-700">Nama Lengkap Siswa</label>
+                            <input type="text" id="nama_lengkap" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+                            <input type="text" id="username" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label for="kelas" class="block text-sm font-medium text-gray-700">Kelas</label>
+                            <input type="text" id="kelas" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Contoh: 9 A">
+                        </div>
+                         <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700">Email Siswa (tidak bisa diubah)</label>
+                            <input type="email" id="email" disabled class="mt-1 block w-full border-gray-300 rounded-md shadow-sm bg-gray-100 cursor-not-allowed">
+                        </div>
+
+                        <div class="flex justify-end space-x-4">
+                            <a href="daftar-siswa.html" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Batal</a>
+                            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 font-semibold">Update Siswa</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script type="module">
+        import { supabase } from '../js/supabase-client.js';
+
+        const displayNameElement = document.getElementById('display-name');
+        const logoutButton = document.getElementById('logout-button');
+        const editStudentForm = document.getElementById('edit-student-form');
+        const loadingFormElement = document.getElementById('loading-form');
+        const formContentElement = document.getElementById('form-content');
+        let studentId = null;
+
+        // Fungsi untuk mengambil data siswa dan mengisi form
+        async function populateForm() {
+            const params = new URLSearchParams(window.location.search);
+            studentId = params.get('id');
+            if (!studentId) {
+                alert('ID siswa tidak ditemukan!');
+                window.location.href = 'daftar-siswa.html';
+                return;
+            }
+
+            // Ambil data dari tabel users
+            const { data: studentData, error: studentError } = await supabase
+                .from('users')
+                .select('nama_lengkap, username, kelas')
+                .eq('id', studentId)
+                .single();
+            
+            if (studentError || !studentData) {
+                alert('Gagal mengambil data profil siswa.');
+                return;
+            }
+
+            // Isi form
+            editStudentForm.nama_lengkap.value = studentData.nama_lengkap;
+            editStudentForm.username.value = studentData.username;
+            editStudentForm.kelas.value = studentData.kelas;
+            editStudentForm.email.placeholder = "Email tidak dapat ditampilkan/diubah.";
+
+
+            loadingFormElement.style.display = 'none';
+            formContentElement.classList.remove('hidden');
+        }
+
+        // Fungsi untuk menangani update siswa
+        editStudentForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const updatedData = {
+                nama_lengkap: editStudentForm.nama_lengkap.value,
+                username: editStudentForm.username.value,
+                kelas: editStudentForm.kelas.value,
+
+            };
+
+            const { error } = await supabase
+                .from('users')
+                .update(updatedData)
+                .eq('id', studentId);
+
+            if (error) {
+                alert('Gagal mengupdate profil siswa: ' + error.message);
+            } else {
+                alert('Profil siswa berhasil diupdate!');
+                window.location.href = 'daftar-siswa.html';
+            }
+        });
+
+        // Fungsi utama untuk inisialisasi halaman
+        async function initializePage() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                window.location.href = '/login.html';
+                return;
+            }
+            const { data: profile } = await supabase.from('users').select('nama_lengkap').eq('id', user.id).single();
+            if (profile) {
+                displayNameElement.textContent = profile.nama_lengkap;
+            }
+            await populateForm();
+        }
+
+        logoutButton.addEventListener('click', async () => {
+            await supabase.auth.signOut();
+            window.location.href = '/login.html';
+        });
+
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+</body>
+</html>

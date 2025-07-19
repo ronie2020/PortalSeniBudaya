@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Siswa - Portal Seni Budaya</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style> body { font-family: 'Inter', sans-serif; } </style>
+</head>
+<body class="bg-gray-50">
+
+    <!-- Navbar -->
+    <header class="bg-white shadow-sm sticky top-0 z-10">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-xl font-bold text-indigo-600">
+                <a href="/index.html">Portal Seni Budaya</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <span class="text-gray-700">Selamat datang, <span id="display-name" class="font-semibold">Memuat...</span></span>
+                <button id="logout-button" class="bg-red-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-600 transition">Logout</button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-12">
+        <!-- Navigation Tabs -->
+        <div class="mb-8 border-b border-gray-200">
+           <nav class="flex justify-center space-x-8" aria-label="Tabs">
+                <a href="dashboard-siswa.html" class="pb-4 px-1 text-gray-500 hover:text-indigo-600 hover:border-indigo-500 whitespace-nowrap">Dashboard</a>
+                <a href="materi-siswa.html" class="pb-4 px-1 text-gray-500 hover:text-indigo-600 hover:border-indigo-500 whitespace-nowrap">Materi Pembelajaran</a>
+                <a href="tugas-siswa.html" class="pb-4 px-1 font-medium text-indigo-600 border-b-2 border-indigo-500 whitespace-nowrap" aria-current="page">Tugas & Latihan</a>
+                <a href="nilai-siswa.html" class="pb-4 px-1 text-gray-500 hover:text-indigo-600 hover:border-indigo-500 whitespace-nowrap">Nilai Saya</a>
+            </nav>
+        </div>
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-12">
+        
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-8">Tugas & Latihan</h1>
+
+        <!-- Bagian Tugas Belum Dikerjakan -->
+         <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Belum Dikerjakan</h2>
+            <div id="belum-dikerjakan-list" class="space-y-4">
+                <p id="loading-belum-dikerjakan" class="text-gray-500">Memuat daftar latihan...</p>
+            </div>
+        </section>
+
+        <!-- Bagian Riwayat Tugas -->
+         <section>
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Riwayat Tugas</h2>
+            <div id="riwayat-tugas-list" class="space-y-4">
+                <p id="loading-riwayat" class="text-gray-500">Memuat riwayat...</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- JavaScript Logic -->
+    <script type="module">
+        import { supabase } from '../js/supabase-client.js';
+
+        const displayNameElement = document.getElementById('display-name');
+        const logoutButton = document.getElementById('logout-button');
+        const belumDikerjakanContainer = document.getElementById('belum-dikerjakan-list');
+        const riwayatTugasContainer = document.getElementById('riwayat-tugas-list');
+        const loadingBelumDikerjakan = document.getElementById('loading-belum-dikerjakan');
+        const loadingRiwayat = document.getElementById('loading-riwayat');
+        
+        let currentUser = null;
+        let userProfile = null;
+
+        async function fetchLatihanAndHasil() {
+            if (!userProfile || !userProfile.kelas) {
+                console.error("Data kelas siswa tidak ditemukan.");
+                loadingBelumDikerjakan.textContent = 'Gagal memuat latihan: Data kelas Anda tidak ditemukan.';
+                return;
+            }
+            
+            // **PERUBAHAN DI SINI: Mengambil latihan berdasarkan kelas siswa**
+            // 'or' akan mengambil latihan jika (kelasnya cocok) ATAU (kelasnya null/kosong)
+            const { data: semuaLatihan, error: latihanError } = await supabase
+                .from('latihan')
+                .select('*')
+                .or(`kelas.eq.${userProfile.kelas},kelas.is.null`)
+                .order('created_at', { ascending: false });
+
+            if (latihanError) {
+                console.error('Error fetching latihan:', latihanError);
+                if (loadingBelumDikerjakan) loadingBelumDikerjakan.textContent = 'Gagal memuat latihan.';
+                if (loadingRiwayat) loadingRiwayat.textContent = 'Gagal memuat riwayat.';
+                return;
+            }
+
+            const { data: hasilSiswa, error: hasilError } = await supabase
+                .from('hasil_latihan')
+                .select('latihan_id, nilai, created_at')
+                .eq('user_id', currentUser.id);
+            
+            if (hasilError) {
+                console.error('Error fetching hasil siswa:', hasilError);
+            }
+
+            const idLatihanSudahDikerjakan = hasilSiswa ? hasilSiswa.map(h => h.latihan_id) : [];
+            
+            const latihanBelumDikerjakan = semuaLatihan.filter(l => !idLatihanSudahDikerjakan.includes(l.id));
+            const latihanSudahDikerjakan = semuaLatihan.filter(l => idLatihanSudahDikerjakan.includes(l.id));
+
+            // Tampilkan latihan yang BELUM dikerjakan
+            if (loadingBelumDikerjakan) loadingBelumDikerjakan.style.display = 'none';
+            if (belumDikerjakanContainer) {
+                belumDikerjakanContainer.innerHTML = '';
+                if (latihanBelumDikerjakan.length === 0) {
+                    belumDikerjakanContainer.innerHTML = '<p class="text-gray-500">Tidak ada tugas yang perlu dikerjakan saat ini.</p>';
+                } else {
+                    latihanBelumDikerjakan.forEach(latihan => {
+                        const latihanCard = document.createElement('div');
+                        latihanCard.className = 'bg-white p-4 rounded-lg shadow-sm border flex justify-between items-center';
+                        
+                        let batasWaktuText = 'Tidak ada batas waktu';
+                        let batasWaktuColorClass = 'text-gray-500';
+                        const now = new Date();
+
+                        if (latihan.batas_waktu) {
+                            const batasWaktuDate = new Date(latihan.batas_waktu);
+                            if (!isNaN(batasWaktuDate)) {
+                                 const options = { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false };
+                                 batasWaktuText = `Batas waktu: ${batasWaktuDate.toLocaleString('id-ID', options)}`;
+                                 if (batasWaktuDate < now) {
+                                     batasWaktuColorClass = 'text-red-600 font-semibold';
+                                 }
+                            }
+                        }
+
+                        latihanCard.innerHTML = `
+                            <div>
+                                <h3 class="font-semibold text-gray-800">${latihan.judul}</h3>
+                                <p class="text-sm mt-1 ${batasWaktuColorClass}">${batasWaktuText.replace('pukul ', '')}</p>
+                            </div>
+                            <a href="kerjakan-latihan.html?id=${latihan.id}" class="px-5 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 transition">
+                                Kerjakan
+                            </a>
+                        `;
+                        belumDikerjakanContainer.appendChild(latihanCard);
+                    });
+                }
+            }
+
+            // Tampilkan latihan yang SUDAH dikerjakan (Riwayat)
+            if (loadingRiwayat) loadingRiwayat.style.display = 'none';
+            if (riwayatTugasContainer) {
+                riwayatTugasContainer.innerHTML = '';
+                if (latihanSudahDikerjakan.length === 0) {
+                    riwayatTugasContainer.innerHTML = '<p class="text-gray-500">Belum ada riwayat pengerjaan tugas.</p>';
+                } else {
+                    latihanSudahDikerjakan.forEach(latihan => {
+                        const hasil = hasilSiswa.find(h => h.latihan_id === latihan.id);
+                        const tanggalDinilai = new Date(hasil.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+                        const latihanCard = document.createElement('div');
+                        latihanCard.className = 'bg-white p-4 rounded-lg shadow-sm border flex justify-between items-center';
+                        
+                        let statusHtml = '';
+                        if (hasil.nilai !== null) {
+                            statusHtml = `
+                                <button disabled class="px-4 py-2 bg-green-100 text-green-700 text-sm font-bold rounded-lg">
+                                    Lihat Nilai (${hasil.nilai})
+                                </button>
+                            `;
+                        } else {
+                            statusHtml = `
+                                <button disabled class="px-4 py-2 bg-yellow-100 text-yellow-800 text-sm font-bold rounded-lg">
+                                    Menunggu Penilaian
+                                </button>
+                            `;
+                        }
+
+                        latihanCard.innerHTML = `
+                            <div>
+                                <h3 class="font-semibold text-gray-800">${latihan.judul}</h3>
+                                <p class="text-sm text-gray-500 mt-1">Dikerjakan pada: ${tanggalDinilai}</p>
+                            </div>
+                            ${statusHtml}
+                        `;
+                        riwayatTugasContainer.appendChild(latihanCard);
+                    });
+                }
+            }
+        }
+
+        async function initializePage() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                window.location.href = '/login.html';
+                return;
+            }
+            currentUser = user;
+
+            // **PERUBAHAN DI SINI: Mengambil data profil siswa (termasuk kelas) terlebih dahulu**
+            const { data: profile, error: profileError } = await supabase
+                .from('users')
+                .select('nama_lengkap, kelas')
+                .eq('id', user.id)
+                .single();
+            
+            if (profileError || !profile) {
+                 console.error("Gagal mengambil profil siswa:", profileError);
+                 return;
+            }
+            
+            userProfile = profile;
+            displayNameElement.textContent = userProfile.nama_lengkap;
+
+            // Baru jalankan fungsi untuk mengambil latihan setelah profil didapatkan
+            await fetchLatihanAndHasil();
+        }
+
+        logoutButton.addEventListener('click', async () => {
+            await supabase.auth.signOut();
+            window.location.href = '/login.html';
+        });
+
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+
+</body>
+</html>

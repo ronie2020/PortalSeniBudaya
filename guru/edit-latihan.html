@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Latihan - Portal Guru</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style> body { font-family: 'Inter', sans-serif; } </style>
+</head>
+<body class="bg-gray-100">
+
+    <div class="flex h-screen bg-gray-100">
+        <!-- Sidebar -->
+        <div class="hidden md:flex flex-col w-64 bg-white shadow-lg">
+            <div class="flex items-center justify-center h-20 shadow-md">
+                <h1 class="text-2xl font-bold text-indigo-600">Portal Guru</h1>
+            </div>
+            <nav class="flex-1 px-4 py-4 space-y-2">
+                <a href="dashboard-guru.html" class="flex items-center px-4 py-2 text-gray-600 hover:bg-indigo-100 hover:text-indigo-600 rounded-lg">
+                    <!-- Icon Dashboard --> Dashboard
+                </a>
+                <a href="manajemen-materi.html" class="flex items-center px-4 py-2 text-gray-600 hover:bg-indigo-100 hover:text-indigo-600 rounded-lg">
+                    <!-- Icon Materi --> Manajemen Materi
+                </a>
+                <a href="manajemen-latihan.html" class="flex items-center px-4 py-2 text-white bg-indigo-600 rounded-lg">
+                    <!-- Icon Latihan --> Manajemen Latihan
+                </a>
+                <a href="rekap-nilai.html" class="flex items-center px-4 py-2 text-gray-600 hover:bg-indigo-100 hover:text-indigo-600 rounded-lg">
+                    <!-- Icon Rekap Nilai --> Rekap Nilai
+                </a>
+                <a href="daftar-siswa.html" class="flex items-center px-4 py-2 text-gray-600 hover:bg-indigo-100 hover:text-indigo-600 rounded-lg">
+                    <!-- Icon Daftar Siswa --> Daftar Siswa
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <!-- PERHATIKAN KELAS 'flex-1' DI BAWAH INI. INI YANG MEMBUAT KONTEN MELEBAR -->
+        <div class="flex flex-col flex-1 overflow-y-auto">
+            <!-- Header -->
+            <div class="flex items-center justify-between h-20 bg-white shadow-md px-6 sticky top-0">
+                <div class="text-2xl font-semibold text-gray-800">Edit Latihan</div>
+                <div class="flex items-center space-x-4">           
+                    <span class="text-gray-600">Selamat datang, <span id="display-name" class="font-semibold">Memuat...</span></span>
+                    <button id="logout-button" class="bg-red-500 text-white py-2 px-4 rounded-lg text-sm font-semibold hover:bg-red-600 transition duration-300">Logout</button>
+                </div>
+            </div>
+            
+            <!-- Content Area: Form Latihan -->
+            <div class="p-6">
+                <form id="latihan-form" class="space-y-5 bg-white p-8 rounded-lg shadow">
+                    <p id="loading-form" class="text-gray-500">Memuat data latihan...</p>
+                    <div id="form-content" class="hidden space-y-8">
+                        <!-- Informasi Umum Latihan -->
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="font-bold text-lg mb-4">Informasi Latihan</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="judul" class="block text-sm font-medium text-gray-700">Judul Latihan</label>
+                                    <input type="text" id="judul" name="judul" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                                </div>
+                                <div>
+                                    <label for="deskripsi" class="block text-sm font-medium text-gray-700">Deskripsi</label>
+                                    <textarea id="deskripsi" name="deskripsi" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></textarea>
+                                </div>
+                                <div>
+                                    <label for="kelas" class="block text-sm font-medium text-gray-700">Untuk Kelas</label>
+                                    <input type="text" id="kelas" name="kelas" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" placeholder="Kosongkan untuk semua kelas, atau isi untuk kelas tertentu(Contoh: 9A)">
+                                </div>
+                                <div>
+                                    <label for="batas_waktu" class="block text-sm font-medium text-gray-700">Batas Waktu Pengerjaan</label>
+                                    <input type="datetime-local" id="batas_waktu" name="batas_waktu" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                                </div>
+                                <div>
+                                    <label for="link_eksternal" class="block text-sm font-medium text-gray-700">Link Latihan Eksternal (Quizizz, dll.)</label>
+                                    <input type="url" id="link_eksternal" name="link_eksternal" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" placeholder="Opsional: Tempelkan link di sini...">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Kontainer untuk Soal-soal -->
+                        <div id="soal-container" class="space-y-6">
+                            <!-- Soal akan ditambahkan di sini oleh JavaScript -->
+                        </div>
+
+                        <!-- Tombol Aksi -->
+                        <div class="flex items-center justify-between">
+                            <button type="button" id="tambah-soal-btn" class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 font-semibold">
+                                + Tambah Soal
+                            </button>
+                            <div class="flex space-x-4">
+                                <a href="manajemen-latihan.html" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Batal</a>
+                                <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 font-semibold">Update Latihan</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script type="module">
+        import { supabase } from '../js/supabase-client.js';
+
+        const displayNameElement = document.getElementById('display-name');
+        const logoutButton = document.getElementById('logout-button');
+        const latihanForm = document.getElementById('latihan-form');
+        const soalContainer = document.getElementById('soal-container');
+        const tambahSoalBtn = document.getElementById('tambah-soal-btn');
+        const loadingFormElement = document.getElementById('loading-form');
+        const formContentElement = document.getElementById('form-content');
+        
+        let latihanId = null;
+        let nomorSoal = 0;
+
+        function tambahSoal(soalData = null) {
+            nomorSoal++;
+            const soalCard = document.createElement('div');
+            soalCard.className = 'soal-card bg-white p-6 rounded-lg shadow';
+            soalCard.innerHTML = `
+                <div class="flex justify-between items-center mb-4">
+                    <h4 class="font-bold text-md">Soal Nomor ${nomorSoal}</h4>
+                    <button type="button" class="remove-soal-btn text-sm text-red-500 hover:underline">Hapus Soal</button>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Pertanyaan</label>
+                        <textarea name="pertanyaan" rows="3" required class="pertanyaan-input mt-1 block w-full border-gray-300 rounded-md shadow-sm"></textarea>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div><label class="block text-sm font-medium text-gray-700">Pilihan A</label><input type="text" name="pilihan_a" required class="pilihan-input mt-1 block w-full border-gray-300 rounded-md shadow-sm"></div>
+                        <div><label class="block text-sm font-medium text-gray-700">Pilihan B</label><input type="text" name="pilihan_b" required class="pilihan-input mt-1 block w-full border-gray-300 rounded-md shadow-sm"></div>
+                        <div><label class="block text-sm font-medium text-gray-700">Pilihan C</label><input type="text" name="pilihan_c" class="pilihan-input mt-1 block w-full border-gray-300 rounded-md shadow-sm"></div>
+                        <div><label class="block text-sm font-medium text-gray-700">Pilihan D</label><input type="text" name="pilihan_d" class="pilihan-input mt-1 block w-full border-gray-300 rounded-md shadow-sm"></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Jawaban Benar</label>
+                            <select name="jawaban_benar" required class="jawaban-benar-select mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                                <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Poin Soal</label>
+                            <input type="number" name="poin" value="10" required class="poin-input mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            if (soalData) {
+                soalCard.querySelector('.pertanyaan-input').value = soalData.pertanyaan;
+                const pilihanInputs = soalCard.querySelectorAll('.pilihan-input');
+                soalData.pilihan.forEach((pilihan, index) => {
+                    if (pilihanInputs[index]) pilihanInputs[index].value = pilihan;
+                });
+                soalCard.querySelector('.jawaban-benar-select').value = soalData.jawaban_benar;
+                if (soalData.poin) {
+                    soalCard.querySelector('.poin-input').value = soalData.poin;
+                }
+            }
+
+            soalContainer.appendChild(soalCard);
+            soalCard.querySelector('.remove-soal-btn').addEventListener('click', () => soalCard.remove());
+        }
+
+        async function populateForm() {
+            const params = new URLSearchParams(window.location.search);
+            latihanId = params.get('id');
+            if (!latihanId) {
+                alert('ID latihan tidak ditemukan!');
+                window.location.href = 'manajemen-latihan.html';
+                return;
+            }
+
+            const { data, error } = await supabase.from('latihan').select('*').eq('id', latihanId).single();
+
+            if (error || !data) {
+                alert('Gagal mengambil data latihan.');
+                return;
+            }
+
+            latihanForm.judul.value = data.judul;
+            latihanForm.deskripsi.value = data.deskripsi;
+            latihanForm.kelas.value = data.kelas;
+            latihanForm.link_eksternal.value = data.link_eksternal;
+
+            if (data.batas_waktu) {
+                try {
+                    const date = new Date(data.batas_waktu);
+                    const formattedDate = date.toISOString().slice(0, 16);
+                    latihanForm.batas_waktu.value = formattedDate;
+                } catch (e) {
+                    console.error("Gagal memformat tanggal batas waktu:", e);
+                }
+            }
+
+            if (data.soal && data.soal.length > 0) {
+                data.soal.forEach(soalData => tambahSoal(soalData));
+            }
+
+            loadingFormElement.style.display = 'none';
+            formContentElement.classList.remove('hidden');
+        }
+
+        tambahSoalBtn.addEventListener('click', () => tambahSoal());
+
+        latihanForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const soalCards = soalContainer.querySelectorAll('.soal-card');
+            const soalArray = [];
+            soalCards.forEach(card => {
+                const pilihan = [];
+                card.querySelectorAll('.pilihan-input').forEach(input => {
+                    if (input.value) pilihan.push(input.value);
+                });
+                soalArray.push({
+                    pertanyaan: card.querySelector('.pertanyaan-input').value,
+                    pilihan: pilihan,
+                    jawaban_benar: card.querySelector('.jawaban-benar-select').value,
+                    poin: parseInt(card.querySelector('.poin-input').value) || 10
+                });
+            });
+
+            const localDateValue = latihanForm.batas_waktu.value;
+            const batasWaktuUTC = localDateValue ? new Date(localDateValue).toISOString() : null;
+
+            const updatedData = {
+                judul: latihanForm.judul.value,
+                deskripsi: latihanForm.deskripsi.value,
+                kelas: latihanForm.kelas.value || null,
+                batas_waktu: batasWaktuUTC,
+                link_eksternal: latihanForm.link_eksternal.value,
+                soal: soalArray.length > 0 ? soalArray : null,
+            };
+
+            const { error } = await supabase.from('latihan').update(updatedData).eq('id', latihanId);
+
+            if (error) {
+                alert('Gagal mengupdate latihan: ' + error.message);
+            } else {
+                alert('Latihan berhasil diupdate!');
+                window.location.href = 'manajemen-latihan.html';
+            }
+        });
+
+        async function initializePage() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                window.location.href = '/login.html';
+                return;
+            }
+            const { data: profile } = await supabase.from('users').select('nama_lengkap').eq('id', user.id).single();
+            if (profile) {
+                displayNameElement.textContent = profile.nama_lengkap;
+            }
+            await populateForm();
+        }
+
+        logoutButton.addEventListener('click', async () => {
+            await supabase.auth.signOut();
+            window.location.href = '/login.html';
+        });
+
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+</body>
+</html>

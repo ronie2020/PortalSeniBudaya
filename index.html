@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Seni Budaya - Pembelajaran Interaktif</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style> body { font-family: 'Inter', sans-serif; } </style>
+</head>
+<body class="bg-gray-50">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-xl font-bold text-indigo-600">
+                <a href="#">Portal Seni Budaya</a>
+            </div>
+            <div id="nav-buttons" class="flex items-center space-x-4">
+                <!-- Tombol akan dimuat di sini oleh JavaScript -->
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-12 md:py-20">
+        <!-- Hero Section -->
+        <section class="text-center">
+            <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900">Selamat Datang di Portal Seni Budaya</h1>
+            <p class="mt-4 text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">Platform pembelajaran interaktif untuk SMP yang dirancang untuk membuat belajar seni dan budaya menjadi lebih menyenangkan dan efektif.</p>
+        </section>
+
+        <!-- Dynamic Call to Action -->
+        <section id="cta-section" class="mt-12 text-center">
+            <!-- Konten CTA akan dimuat di sini oleh JavaScript -->
+        </section>
+
+        <!-- Statistik Portal -->
+        <section class="mt-16">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <div class="bg-white p-8 rounded-lg shadow text-center">
+                    <h3 class="text-lg font-medium text-gray-500">Total Materi</h3>
+                    <p id="stat-total-materi" class="text-5xl font-bold text-indigo-600 mt-2">-</p>
+                </div>
+                <div class="bg-white p-8 rounded-lg shadow text-center">
+                    <h3 class="text-lg font-medium text-gray-500">Total Latihan</h3>
+                    <p id="stat-total-latihan" class="text-5xl font-bold text-green-600 mt-2">-</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Konten Terbaru -->
+        <!-- PERUBAHAN DI SINI: Menggunakan grid untuk menampung materi dan latihan -->
+        <div class="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Materi Terbaru -->
+            <section>
+                <h2 class="text-3xl font-bold text-center text-gray-900 mb-8">Materi Terbaru</h2>
+                <div id="recent-materi-list" class="space-y-4">
+                    <p id="loading-materi" class="text-gray-500 text-center">Memuat materi...</p>
+                </div>
+            </section>
+
+            <!-- Latihan Terbaru -->
+            <section>
+                <h2 class="text-3xl font-bold text-center text-gray-900 mb-8">Latihan Terbaru</h2>
+                <div id="recent-latihan-list" class="space-y-4">
+                    <p id="loading-latihan" class="text-gray-500 text-center">Memuat latihan...</p>
+                </div>
+            </section>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white mt-16">
+        <div class="container mx-auto px-6 py-8 text-center text-gray-500">
+            <p>&copy; 2025 @ Ri.. Portal Seni Budaya. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script type="module">
+        import { supabase } from './js/supabase-client.js';
+
+        const navButtons = document.getElementById('nav-buttons');
+        const ctaSection = document.getElementById('cta-section');
+        const statTotalMateri = document.getElementById('stat-total-materi');
+        const statTotalLatihan = document.getElementById('stat-total-latihan');
+        const recentMateriList = document.getElementById('recent-materi-list');
+        const loadingMateri = document.getElementById('loading-materi');
+        const recentLatihanList = document.getElementById('recent-latihan-list');
+        const loadingLatihan = document.getElementById('loading-latihan');
+
+        // Fungsi untuk mengambil statistik publik
+        async function fetchPublicStats() {
+            const { data, error } = await supabase.rpc('get_public_portal_stats');
+            if (error) {
+                console.error("Error fetching public stats:", error);
+                return;
+            }
+            if (data && data.length > 0) {
+                statTotalMateri.textContent = data[0].total_materi;
+                statTotalLatihan.textContent = data[0].total_latihan;
+            }
+        }
+
+        // Fungsi untuk mengambil item terbaru (materi dan latihan)
+        async function fetchRecentItems() {
+            // Ambil 3 materi terbaru
+            const { data: materi, error: materiError } = await supabase
+                .from('materi')
+                .select('judul, deskripsi_singkat')
+                .order('created_at', { ascending: false })
+                .limit(3);
+
+            loadingMateri.style.display = 'none';
+            recentMateriList.innerHTML = '';
+            if (materiError) {
+                recentMateriList.innerHTML = '<p class="text-red-500 text-center">Gagal memuat materi.</p>';
+            } else if (materi && materi.length > 0) {
+                materi.forEach(item => {
+                    const materiCard = document.createElement('div');
+                    materiCard.className = 'bg-white p-6 rounded-lg shadow-sm border';
+                    materiCard.innerHTML = `
+                        <h3 class="font-bold text-lg text-gray-800">${item.judul}</h3>
+                        <p class="text-gray-600 mt-2 text-sm">${item.deskripsi_singkat || ''}</p>
+                    `;
+                    recentMateriList.appendChild(materiCard);
+                });
+            } else {
+                recentMateriList.innerHTML = '<p class="text-gray-500 text-center">Belum ada materi yang tersedia.</p>';
+            }
+
+            // Ambil 3 latihan terbaru
+            const { data: latihan, error: latihanError } = await supabase
+                .from('latihan')
+                .select('judul, deskripsi')
+                .order('created_at', { ascending: false })
+                .limit(3);
+
+            loadingLatihan.style.display = 'none';
+            recentLatihanList.innerHTML = '';
+            if (latihanError) {
+                recentLatihanList.innerHTML = '<p class="text-red-500 text-center">Gagal memuat latihan.</p>';
+            } else if (latihan && latihan.length > 0) {
+                latihan.forEach(item => {
+                    const latihanCard = document.createElement('div');
+                    latihanCard.className = 'bg-white p-6 rounded-lg shadow-sm border';
+                    latihanCard.innerHTML = `
+                        <h3 class="font-bold text-lg text-gray-800">${item.judul}</h3>
+                        <p class="text-gray-600 mt-2 text-sm">${item.deskripsi || ''}</p>
+                    `;
+                    recentLatihanList.appendChild(latihanCard);
+                });
+            } else {
+                recentLatihanList.innerHTML = '<p class="text-gray-500 text-center">Belum ada latihan yang tersedia.</p>';
+            }
+        }
+
+        // Fungsi utama untuk inisialisasi halaman
+        async function initializePage() {
+            const { data: { session } } = await supabase.auth.getSession();
+
+            if (session) {
+                const { data: profile } = await supabase.from('users').select('role').eq('id', session.user.id).single();
+                const dashboardUrl = profile.role === 'guru' ? '/guru/dashboard-guru.html' : '/siswa/dashboard-siswa.html';
+                
+                navButtons.innerHTML = `<a href="${dashboardUrl}" class="px-5 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-semibold">Masuk ke Dashboard</a>`;
+                ctaSection.innerHTML = `
+                    <h2 class="text-2xl font-bold text-gray-800">Anda sudah login!</h2>
+                    <p class="mt-2 text-gray-600">Lanjutkan ke dashboard Anda untuk mulai belajar atau mengelola konten.</p>
+                    <a href="${dashboardUrl}" class="mt-6 inline-block px-8 py-3 bg-indigo-600 text-white text-lg font-semibold rounded-lg hover:bg-indigo-700 transition">
+                        Buka Dashboard
+                    </a>
+                `;
+            } else {
+                navButtons.innerHTML = `<a href="/login.html" class="px-5 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-semibold">Login</a>`;
+                ctaSection.innerHTML = `
+                    <h2 class="text-2xl font-bold text-gray-800">Akses Semua Fitur</h2>
+                    <p class="mt-2 text-gray-600">Silakan login untuk mengakses tugas, mengumpulkan pekerjaan, dan melihat nilai.</p>
+                    <a href="/login.html" class="mt-6 inline-block px-8 py-3 bg-indigo-600 text-white text-lg font-semibold rounded-lg hover:bg-indigo-700 transition">
+                        Login Sekarang
+                    </a>
+                `;
+            }
+
+            // Muat data publik
+            await fetchPublicStats();
+            await fetchRecentItems();
+        }
+
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nilai Saya - Portal Seni Budaya</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style> body { font-family: 'Inter', sans-serif; } </style>
+</head>
+<body class="bg-gray-50">
+
+    <!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Siswa - Portal Seni Budaya</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style> body { font-family: 'Inter', sans-serif; } </style>
+</head>
+<body class="bg-gray-50">
+
+    <!-- Navbar -->
+    <header class="bg-white shadow-sm sticky top-0 z-10">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-xl font-bold text-indigo-600">
+                <a href="/index.html">Portal Seni Budaya</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <span class="text-gray-700">Selamat datang, <span id="display-name" class="font-semibold">Memuat...</span></span>
+                <button id="logout-button" class="bg-red-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-600 transition">Logout</button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-12">
+        <!-- Navigation Tabs -->
+        <div class="mb-8 border-b border-gray-200">
+           <nav class="flex justify-center space-x-8" aria-label="Tabs">
+                <a href="dashboard-siswa.html" class="pb-4 px-1 text-gray-500 hover:text-indigo-600 hover:border-indigo-500 whitespace-nowrap">Dashboard</a>
+                <a href="materi-siswa.html" class="pb-4 px-1 text-gray-500 hover:text-indigo-600 hover:border-indigo-500 whitespace-nowrap">Materi Pembelajaran</a>
+                <a href="tugas-siswa.html" class="pb-4 px-1 text-gray-500 hover:text-indigo-600 hover:border-indigo-500 whitespace-nowrap">Tugas & Latihan</a>
+                <a href="nilai-siswa.html" class="pb-4 px-1 font-medium text-indigo-600 border-b-2 border-indigo-500 whitespace-nowrap" aria-current="page">Nilai Saya</a>
+            </nav>
+        </div>
+
+        <!-- Daftar Nilai -->
+        <section>
+            <h1 class="text-3xl font-bold text-gray-900 mb-6">Rekapitulasi Nilai</h1>
+            <div class="bg-white p-6 rounded-lg shadow overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Judul Latihan</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Pengerjaan</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nilai</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Feedback Guru</th>
+                        </tr>
+                    </thead>
+                    <tbody id="nilai-list-body" class="bg-white divide-y divide-gray-200">
+                        <!-- Data nilai akan dimuat di sini oleh JavaScript -->
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                                <p id="loading-nilai">Memuat data nilai...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- JavaScript Logic -->
+    <script type="module">
+        import { supabase } from '../js/supabase-client.js';
+
+        const displayNameElement = document.getElementById('display-name');
+        const logoutButton = document.getElementById('logout-button');
+        const nilaiListBody = document.getElementById('nilai-list-body');
+        const loadingNilaiElement = document.getElementById('loading-nilai').parentElement.parentElement; // Get the <tr> element
+
+        // Fungsi untuk mengambil dan menampilkan daftar nilai siswa
+        async function fetchNilai() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                window.location.href = '/login.html';
+                return;
+            }
+
+            // Ambil semua hasil latihan siswa, gabungkan dengan data dari tabel latihan
+            const { data: hasil, error } = await supabase
+                .from('hasil_latihan')
+                .select(`
+                    created_at,
+                    nilai,
+                    feedback,
+                    latihan ( judul )
+                `)
+                .eq('user_id', user.id)
+                .order('created_at', { ascending: false });
+
+            loadingNilaiElement.style.display = 'none';
+            nilaiListBody.innerHTML = '';
+
+            if (error) {
+                console.error('Error fetching nilai:', error);
+                nilaiListBody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-red-500">Gagal memuat data nilai.</td></tr>';
+                return;
+            }
+
+            if (hasil.length === 0) {
+                nilaiListBody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">Anda belum mengerjakan latihan apapun.</td></tr>';
+            } else {
+                hasil.forEach(item => {
+                    const nilaiRow = document.createElement('tr');
+                    const tglPengerjaan = new Date(item.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+                    
+                    let statusHtml, nilaiHtml;
+
+                    if (item.nilai !== null) {
+                        statusHtml = '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Selesai Dinilai</span>';
+                        nilaiHtml = `<span class="text-lg font-bold text-gray-900">${item.nilai}</span>`;
+                    } else {
+                        statusHtml = '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Menunggu Penilaian</span>';
+                        nilaiHtml = '<span class="text-sm text-gray-500">-</span>';
+                    }
+
+                    nilaiRow.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.latihan.judul}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${tglPengerjaan}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${statusHtml}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${nilaiHtml}</td>
+                        <td class="px-6 py-4 whitespace-normal text-sm text-gray-500">${item.feedback || '-'}</td>
+                    `;
+                    nilaiListBody.appendChild(nilaiRow);
+                });
+            }
+        }
+
+        // Fungsi utama untuk inisialisasi halaman
+        async function initializePage() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                window.location.href = '/login.html';
+                return;
+            }
+            const { data: profile } = await supabase.from('users').select('nama_lengkap').eq('id', user.id).single();
+            if (profile) {
+                displayNameElement.textContent = profile.nama_lengkap;
+            }
+            await fetchNilai();
+        }
+
+        logoutButton.addEventListener('click', async () => {
+            await supabase.auth.signOut();
+            window.location.href = '/login.html';
+        });
+
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+</body>
+</html>

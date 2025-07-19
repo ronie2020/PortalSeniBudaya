@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Portal Seni Budaya</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 flex items-center justify-center min-h-screen">
+
+    <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Login ke Akun Anda</h1>
+            <p class="text-gray-500 mt-2">Selamat datang kembali! Silakan masukkan detail Anda.</p>
+        </div>
+        
+        <!-- Formulir Login -->
+        <form id="login-form">
+            <div class="mb-4">
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Alamat Email</label>
+                <input type="email" id="email" name="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" required placeholder="contoh@email.com">
+            </div>
+            <div class="mb-6">
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <input type="password" id="password" name="password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" required placeholder="********">
+            </div>
+            
+            <!-- Tombol Login -->
+            <button type="submit" class="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200">
+                Login
+            </button>
+        </form>
+        
+        <!-- Pesan Error -->
+        <div id="error-message" class="mt-4 text-center text-red-600 text-sm"></div>
+
+        <div class="text-center mt-6">
+            <a href="/index.html" class="text-sm text-indigo-600 hover:underline">&larr; Kembali ke Beranda</a>
+        </div>
+    </div>
+
+    <!-- ================================================== -->
+    <!-- SCRIPT UTAMA - BAGIAN YANG DIPERBAIKI -->
+    <!-- ================================================== -->
+    <script type="module">
+        // 1. Impor variabel 'supabase' dari file client
+        //    Gunakan path './js/...' karena login.html ada di folder root
+        import { supabase } from './js/supabase-client.js';
+
+        const loginForm = document.getElementById('login-form');
+        const errorMessage = document.getElementById('error-message');
+
+        loginForm.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Mencegah form mengirim data secara tradisional
+
+            const email = loginForm.email.value;
+            const password = loginForm.password.value;
+            errorMessage.textContent = ''; // Bersihkan pesan error sebelumnya
+
+            // 2. Proses Login menggunakan Supabase
+            const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password,
+            });
+
+            if (loginError) {
+                console.error('Login Error:', loginError.message);
+                errorMessage.textContent = 'Login Gagal: Periksa kembali email dan password Anda.';
+                return;
+            }
+
+            // Jika login berhasil, ambil role pengguna
+            const { data: profile, error: profileError } = await supabase
+                .from('users')
+                .select('role')
+                .eq('id', loginData.user.id)
+                .single();
+
+            if (profileError) {
+                console.error('Profile Error:', profileError.message);
+                errorMessage.textContent = 'Gagal mengambil data pengguna. Hubungi admin.';
+                await supabase.auth.signOut(); // Logout jika gagal ambil profil
+                return;
+            }
+
+            // 3. Arahkan pengguna berdasarkan rolenya
+            if (profile.role === 'guru') {
+                window.location.href = '/guru/dashboard-guru.html';
+            } else if (profile.role === 'siswa') {
+                window.location.href = '/siswa/dashboard-siswa.html';
+            } else {
+                errorMessage.textContent = 'Role tidak dikenali.';
+                await supabase.auth.signOut();
+            }
+        });
+    </script>
+
+</body>
+</html>
