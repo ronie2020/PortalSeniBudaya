@@ -3,29 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar Siswa - Portal Seni Budaya</title>
+    <title>Daftar Siswa - Portal Guru</title>
     
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-    </style>
+    <style> body { font-family: 'Inter', sans-serif; } </style>
 </head>
 <body class="bg-gray-100">
 
     <div class="flex h-screen bg-gray-100">
-        <!-- Sidebar (Sama seperti di dashboard) -->
+        <!-- Sidebar -->
         <div class="hidden md:flex flex-col w-64 bg-white shadow-lg">
-             <div class="flex items-center justify-center h-20 shadow-md">
-               <a href="../index.html" class="text-2xl font-bold text-indigo-600">Portal Guru</a>
+            <div class="flex items-center justify-center h-20 shadow-md">
+                <h1 class="text-2xl font-bold text-indigo-600">Portal Guru</h1>
             </div>
             <nav class="flex-1 px-4 py-4 space-y-2">
                 <a href="dashboard-guru.html" class="flex items-center px-4 py-2 text-gray-600 hover:bg-indigo-100 hover:text-indigo-600 rounded-lg transition duration-200">
@@ -59,56 +51,66 @@
 
         <!-- Main Content -->
         <div class="flex flex-col flex-1 overflow-y-auto">
-            <!-- Header -->
-            <div class="flex items-center justify-between h-20 bg-white shadow-md px-6">
-                <div class="text-2xl font-semibold text-gray-800">Daftar Siswa</div>
-                <div class="flex items-center space-x-4">
-                    <span class="text-gray-600">Selamat datang, <span id="display-name" class="font-semibold">Memuat...</span></span>
-                    <button id="logout-button" class="bg-red-500 text-white py-2 px-4 rounded-lg text-sm font-semibold hover:bg-red-600 transition duration-300">Logout</button>
+            <main class="container mx-auto px-auto py-auto">
+                <!-- Header -->
+                <div class="flex items-center justify-between h-20 bg-white shadow-md px-6 sticky top-0">
+                    <div class="text-2xl font-semibold text-gray-800">Daftar Siswa</div>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-gray-600">Selamat datang, <span id="display-name" class="font-semibold">Memuat...</span></span>
+                        <button id="logout-button" class="bg-red-500 text-white py-2 px-4 rounded-lg text-sm font-semibold hover:bg-red-600 transition duration-300">Logout</button>
+                    </div>
                 </div>
-            </div>
             
-            <!-- Content Area -->
-            <div class="p-6">
-
-                <div class="flex justify-end mb-6 space-x-4">
-                    <a href="upload-siswa.html" class="px-5 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold shadow">
-                        Upload Daftar Siswa
-                    </a>
-                    <a href="tambah-siswa.html" class="px-5 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-semibold shadow">
-                        + Tambah Siswa Baru
-                    </a>
-                </div>
-
                 <!-- Content Area -->
-            <div class="p-6">
-                <div class="bg-white p-6 rounded-lg shadow overflow-x-auto">
-                    <h3 class="font-bold text-xl mb-4 text-gray-800">Semua Siswa Terdaftar</h3>
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Lengkap</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>                              
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kelas</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Dibuat</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="student-list-body" class="bg-white divide-y divide-gray-200">
-                            <!-- Data siswa akan dimuat di sini oleh JavaScript -->
-                            <tr>
-                                <td colspan="4" class="px-6 py-4 text-center text-gray-500">
-                                    <p id="loading-students">Memuat data siswa...</p>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="p-6">
+                    <!-- PERUBAHAN DI SINI: Menambahkan Filter dan Pencarian -->
+                    <div class="mb-6 bg-white p-4 rounded-lg shadow flex flex-col md:flex-row items-center gap-4">
+                        <div class="w-full md:flex-1">
+                            <label for="search-input" class="block text-sm font-medium text-gray-700">Cari Nama Siswa</label>
+                            <input type="search" id="search-input" placeholder="Ketik nama untuk mencari..." class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div class="w-full md:w-1/3">
+                            <label for="kelas-filter" class="block text-sm font-medium text-gray-700">Filter Berdasarkan Kelas</label>
+                            <select id="kelas-filter" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="">Semua Kelas</option>
+                                <!-- Opsi kelas akan diisi oleh JavaScript -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end mb-6 space-x-4">
+                        <a href="upload-siswa.html" class="px-5 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold shadow">
+                            Upload Daftar Siswa
+                        </a>
+                        <a href="tambah-siswa.html" class="px-5 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-semibold shadow">
+                            + Tambah Siswa Baru
+                        </a>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow overflow-x-auto">
+                        <h3 class="font-bold text-xl mb-4 text-gray-800">Semua Siswa Terdaftar</h3>
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Lengkap</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kelas</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Dibuat</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="student-list-body" class="bg-white divide-y divide-gray-200">
+                                <tr><td colspan="6" class="px-6 py-4 text-center text-gray-500"><p id="loading-students">Memuat data siswa...</p></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
+            </main>                
         </div>
     </div>
 
+    <!-- JavaScript Logic -->
     <script type="module">
         import { supabase } from '../js/supabase-client.js';
 
@@ -116,44 +118,67 @@
         const logoutButton = document.getElementById('logout-button');
         const studentListBody = document.getElementById('student-list-body');
         const loadingStudentsElement = document.getElementById('loading-students').parentElement.parentElement;
+        const searchInput = document.getElementById('search-input');
+        const kelasFilter = document.getElementById('kelas-filter');
 
-        // Fungsi untuk menghapus siswa
         async function handleDelete(studentId, studentName) {
-            if (confirm(`Apakah Anda yakin ingin menghapus siswa "${studentName}"? Tindakan ini tidak dapat dibatalkan.`)) {
-                // Panggil fungsi database yang sudah kita buat
-                const { error } = await supabase.rpc('delete_user_by_id', {
-                    user_id_to_delete: studentId
-                });
-
+            if (confirm(`Apakah Anda yakin ingin menghapus siswa "${studentName}"?`)) {
+                const { error } = await supabase.rpc('delete_user_by_id', { user_id_to_delete: studentId });
                 if (error) {
-                    console.error('Error deleting student:', error);
                     alert('Gagal menghapus siswa: ' + error.message);
                 } else {
                     alert('Siswa berhasil dihapus.');
-                    fetchStudents(); // Muat ulang daftar siswa
+                    fetchStudents();
                 }
             }
         }
 
-        // Fungsi untuk mengambil dan menampilkan daftar siswa
-        async function fetchStudents() {
-            const { data: students, error } = await supabase
+        // Fungsi baru untuk mengisi dropdown filter kelas
+        async function populateKelasFilter() {
+            const { data, error } = await supabase.from('users').select('kelas');
+            if (error) {
+                console.error('Error fetching kelas list:', error);
+                return;
+            }
+            const kelasSet = new Set(data.map(item => item.kelas).filter(Boolean)); // Ambil kelas unik & hapus yg kosong
+            kelasFilter.innerHTML = '<option value="">Semua Kelas</option>'; // Reset
+            kelasSet.forEach(kelas => {
+                const option = document.createElement('option');
+                option.value = kelas;
+                option.textContent = kelas;
+                kelasFilter.appendChild(option);
+            });
+        }
+
+        // Fungsi fetchStudents sekarang menerima parameter filter
+        async function fetchStudents(searchTerm = '', filterKelas = '') {
+            let query = supabase
                 .from('users')
                 .select('id, nama_lengkap, username, kelas, created_at')
-                .eq('role', 'siswa')
-                .order('created_at', { ascending: true });
+                .eq('role', 'siswa');
+
+            if (searchTerm) {
+                query = query.ilike('nama_lengkap', `%${searchTerm}%`); // ilike untuk case-insensitive
+            }
+            if (filterKelas) {
+                query = query.eq('kelas', filterKelas);
+            }
+            
+            query = query.order('created_at', { ascending: true });
+
+            const { data: students, error } = await query;
 
             loadingStudentsElement.style.display = 'none';
             studentListBody.innerHTML = '';
 
             if (error) {
                 console.error('Error fetching students:', error);
-                studentListBody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-red-500">Gagal memuat data siswa.</td></tr>';
+                studentListBody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-red-500">Gagal memuat data siswa.</td></tr>';
                 return;
             }
 
             if (students.length === 0) {
-                studentListBody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">Belum ada siswa yang terdaftar.</td></tr>';
+                studentListBody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">Tidak ada siswa yang cocok dengan kriteria.</td></tr>';
             } else {
                 students.forEach((student, index) => {
                     const studentRow = document.createElement('tr');
@@ -173,12 +198,9 @@
                     studentListBody.appendChild(studentRow);
                 });
 
-                // Tambahkan event listener untuk semua tombol hapus
                 document.querySelectorAll('.delete-btn').forEach(button => {
                     button.addEventListener('click', (e) => {
-                        const studentId = e.target.dataset.id;
-                        const studentName = e.target.dataset.name;
-                        handleDelete(studentId, studentName);
+                        handleDelete(e.target.dataset.id, e.target.dataset.name);
                     });
                 });
             }
@@ -195,7 +217,17 @@
             if (profile) {
                 displayNameElement.textContent = profile.nama_lengkap;
             }
+            
+            await populateKelasFilter();
             await fetchStudents();
+
+            // Tambahkan event listener untuk filter
+            searchInput.addEventListener('input', () => {
+                fetchStudents(searchInput.value, kelasFilter.value);
+            });
+            kelasFilter.addEventListener('change', () => {
+                fetchStudents(searchInput.value, kelasFilter.value);
+            });
         }
 
         logoutButton.addEventListener('click', async () => {
@@ -205,6 +237,5 @@
 
         document.addEventListener('DOMContentLoaded', initializePage);
     </script>
-
 </body>
 </html>

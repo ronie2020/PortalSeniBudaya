@@ -59,65 +59,66 @@
 
         <!-- Main Content -->
         <div class="flex flex-col flex-1 overflow-y-auto">
-            <!-- Header -->
-            <div class="flex items-center justify-between h-20 bg-white shadow-md px-6">
-                <div class="text-2xl font-semibold text-gray-800">Tambah Latihan Baru</div>
-                <div class="flex items-center space-x-4">           
-                    <span class="text-gray-600">Selamat datang, <span id="display-name" class="font-semibold">Memuat...</span></span>
-                    <button id="logout-button" class="bg-red-500 text-white py-2 px-4 rounded-lg text-sm font-semibold hover:bg-red-600 transition duration-300">Logout</button>
+            <main class="container mx-auto px-auto py-auto">
+                <!-- Header -->
+                <div class="flex items-center justify-between h-20 bg-white shadow-md px-6">
+                    <div class="text-2xl font-semibold text-gray-800">Tambah Latihan Baru</div>
+                    <div class="flex items-center space-x-4">           
+                        <span class="text-gray-600">Selamat datang, <span id="display-name" class="font-semibold">Memuat...</span></span>
+                        <button id="logout-button" class="bg-red-500 text-white py-2 px-4 rounded-lg text-sm font-semibold hover:bg-red-600 transition duration-300">Logout</button>
+                    </div>
                 </div>
-            </div>
-            
-             <!-- Content Area: Form Latihan -->
-            <div class="p-6">
-                <form id="latihan-form" class="space-y-8">
-                    <!-- Informasi Umum Latihan -->
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <h3 class="font-bold text-lg mb-4">Informasi Latihan</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label for="judul" class="block text-sm font-medium text-gray-700">Judul Latihan</label>
-                                <input type="text" id="judul" name="judul" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                            </div>
-                            <div>
-                                <label for="deskripsi" class="block text-sm font-medium text-gray-700">Deskripsi</label>
-                                <textarea id="deskripsi" name="deskripsi" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></textarea>
-                            </div>
-                            <div>
-                                <label for="kelas" class="block text-sm font-medium text-gray-700">Untuk Kelas</label>
-                                <input type="text" id="kelas" name="kelas" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" placeholder="Kosongkan untuk semua kelas, atau isi (Contoh: 9A)">
-                            </div>
-                            <div>
-                                <label for="batas_waktu" class="block text-sm font-medium text-gray-700">Batas Waktu Pengerjaan</label>
-                                <input type="datetime-local" id="batas_waktu" name="batas_waktu" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                            </div>
+                
+                <!-- Content Area: Form Latihan -->
+                <div class="p-6">
+                    <form id="latihan-form" class="space-y-8">
+                        <!-- Informasi Umum Latihan -->
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="font-bold text-lg mb-4">Informasi Latihan</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="judul" class="block text-sm font-medium text-gray-700">Judul Latihan</label>
+                                    <input type="text" id="judul" name="judul" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                                </div>
+                                <div>
+                                    <label for="deskripsi" class="block text-sm font-medium text-gray-700">Deskripsi</label>
+                                    <textarea id="deskripsi" name="deskripsi" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></textarea>
+                                </div>
+                                <div>
+                                    <label for="kelas" class="block text-sm font-medium text-gray-700">Untuk Kelas</label>
+                                    <input type="text" id="kelas" name="kelas" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" placeholder="Kosongkan untuk semua kelas, atau isi (Contoh: 9A)">
+                                </div>
+                                <div>
+                                    <label for="batas_waktu" class="block text-sm font-medium text-gray-700">Batas Waktu Pengerjaan</label>
+                                    <input type="datetime-local" id="batas_waktu" name="batas_waktu" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                                </div>
 
-                            <!-- Menambahkan input link eksternal -->
-                            <div>
-                                <label for="link_eksternal" class="block text-sm font-medium text-gray-700">Link Latihan Eksternal (Quizizz, dll.)</label>
-                                <input type="url" id="link_eksternal" name="link_eksternal" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" placeholder="Opsional: Tempelkan link di sini...">
+                                <!-- Menambahkan input link eksternal -->
+                                <div>
+                                    <label for="link_eksternal" class="block text-sm font-medium text-gray-700">Link Latihan Eksternal (Quizizz, dll.)</label>
+                                    <input type="url" id="link_eksternal" name="link_eksternal" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" placeholder="Opsional: Tempelkan link di sini...">
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Kontainer untuk Soal-soal -->
-                    <div id="soal-container" class="space-y-6">
-                        <!-- Soal akan ditambahkan di sini oleh JavaScript -->
-                    </div>
-
-                    <!-- Tombol Aksi -->
-                    <div class="flex items-center justify-between">
-                        <button type="button" id="tambah-soal-btn" class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 font-semibold">
-                            + Tambah Soal
-                        </button>
-                        <div class="flex space-x-4">
-                            <a href="manajemen-latihan.html" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Batal</a>
-                            <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 font-semibold">Simpan Latihan</button>
+                        <!-- Kontainer untuk Soal-soal -->
+                        <div id="soal-container" class="space-y-6">
+                            <!-- Soal akan ditambahkan di sini oleh JavaScript -->
                         </div>
-                    </div>
-                </form>
-            </div>
 
+                        <!-- Tombol Aksi -->
+                        <div class="flex items-center justify-between">
+                            <button type="button" id="tambah-soal-btn" class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 font-semibold">
+                                + Tambah Soal
+                            </button>
+                            <div class="flex space-x-4">
+                                <a href="manajemen-latihan.html" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Batal</a>
+                                <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 font-semibold">Simpan Latihan</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </main>
         </div>
     </div>
 

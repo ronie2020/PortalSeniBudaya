@@ -22,6 +22,7 @@
 <body class="bg-gray-100">
 
     <div class="flex h-screen bg-gray-100">
+
         <!-- Sidebar -->
         <div class="hidden md:flex flex-col w-64 bg-white shadow-lg">
             <div class="flex items-center justify-center h-20 shadow-md">
@@ -59,34 +60,35 @@
 
         <!-- Main Content -->
         <div class="flex flex-col flex-1 overflow-y-auto">
-            <!-- Header -->
-            <div class="flex items-center justify-between h-20 bg-white shadow-md px-6">
-                <div class="text-2xl font-semibold text-gray-800">Manajemen Materi</div>
-                <div class="flex items-center space-x-4">
-                    <span class="text-gray-600">Selamat datang, <span id="display-name" class="font-semibold">Memuat...</span></span>
-                    <button id="logout-button" class="bg-red-500 text-white py-2 px-4 rounded-lg text-sm font-semibold hover:bg-red-600 transition duration-300">Logout</button>
-                </div>
-            </div>
-            
-            <!-- Content Area -->
-            <div class="p-6">
-                <!-- Tombol Tambah Materi -->
-                <div class="mb-6">
-                    <a href="tambah-materi.html" class="inline-block bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 transition duration-300">
-                        + Tambah Materi Baru
-                    </a>
-                </div>
-
-                <!-- Daftar Materi yang Sudah Ada -->
-                <div>
-                    <h3 class="font-bold text-xl mb-4 text-gray-800">Daftar Materi Anda</h3>
-                    <div id="materi-list" class="space-y-4">
-                        <!-- Materi akan dimuat di sini oleh JavaScript -->
-                        <p id="loading-materi" class="text-gray-500">Memuat materi...</p>
+           <main class="container mx-auto px-auto py-auto">
+                <!-- Header -->
+                <div class="flex items-center justify-between h-20 bg-white shadow-md px-6">
+                    <div class="text-2xl font-semibold text-gray-800">Manajemen Materi</div>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-gray-600">Selamat datang, <span id="display-name" class="font-semibold">Memuat...</span></span>
+                        <button id="logout-button" class="bg-red-500 text-white py-2 px-4 rounded-lg text-sm font-semibold hover:bg-red-600 transition duration-300">Logout</button>
                     </div>
                 </div>
-            </div>
-            </div>
+            
+                <!-- Content Area -->            
+                <div class="p-6">
+                    <!-- Tombol Tambah Materi -->
+                    <div class="mb-6">
+                        <a href="tambah-materi.html" class="inline-block bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 transition duration-300">
+                            + Tambah Materi Baru
+                        </a>
+                    </div>
+
+                    <!-- Daftar Materi yang Sudah Ada -->
+                    <div>
+                        <h3 class="font-bold text-xl mb-4 text-gray-800">Daftar Materi Anda</h3>
+                        <div id="materi-list" class="space-y-4">
+                            <!-- Materi akan dimuat di sini oleh JavaScript -->
+                            <p id="loading-materi" class="text-gray-500">Memuat materi...</p>
+                        </div>
+                    </div>                
+                </div>
+            </main>
         </div>
     </div>
 

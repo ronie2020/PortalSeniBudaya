@@ -59,51 +59,53 @@
 
         <!-- Main Content -->
         <div class="flex flex-col flex-1 overflow-y-auto">
+            <main class="container mx-auto px-auto py-auto">
             <!-- Header -->
-            <div class="flex items-center justify-between h-20 bg-white shadow-md px-6">
-                <div class="text-2xl font-semibold text-gray-800">Tambah Siswa Baru</div>
-                <div class="flex items-center space-x-4">
-                    <span class="text-gray-600">Selamat datang, <span id="display-name" class="font-semibold">Memuat...</span></span>
-                    <button id="logout-button" class="text-sm text-red-500 hover:text-red-700 font-semibold">Logout</button>
+                <div class="flex items-center justify-between h-20 bg-white shadow-md px-6">
+                    <div class="text-2xl font-semibold text-gray-800">Tambah Siswa Baru</div>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-gray-600">Selamat datang, <span id="display-name" class="font-semibold">Memuat...</span></span>
+                       <button id="logout-button" class="bg-red-500 text-white py-2 px-4 rounded-lg text-sm font-semibold hover:bg-red-600 transition duration-300">Logout</button>
+                    </div>
                 </div>
-            </div>
-            
-            <!-- Content Area: Form Tambah Siswa -->
-            <div class="p-6">
-                <form id="add-student-form" class="bg-white p-8 rounded-lg shadow space-y-6">
-                    <p class="text-sm text-gray-600">Halaman ini akan membuat akun login baru untuk siswa dan menambahkannya ke daftar siswa.</p>
-                    <div>
-                        <label for="nama_lengkap" class="block text-sm font-medium text-gray-700">Nama Lengkap Siswa</label>
-                        <input type="text" id="nama_lengkap" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                    </div>
-                    <div>
-                        <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
-                        <input type="text" id="username" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                    </div>
-                    <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700">Email Siswa (untuk login)</label>
-                        <input type="email" id="email" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                    </div>
-                    <div>
-                        <label for="kelas" class="block text-sm font-medium text-gray-700">Kelas</label>
-                        <input type="text" id="kelas" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Contoh: 9 A">
-                    </div>
-                    <div>
-                        <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                        <input type="password" id="password" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" minlength="6">
-                        <p class="text-xs text-gray-500 mt-1">Minimal 6 karakter.</p>
-                    </div>
+                
+                <!-- Content Area: Form Tambah Siswa -->
+                <div class="p-6">
+                    <form id="add-student-form" class="bg-white p-8 rounded-lg shadow space-y-6">
+                        <p class="text-sm text-gray-600">Halaman ini akan membuat akun login baru untuk siswa dan menambahkannya ke daftar siswa.</p>
+                        <div>
+                            <label for="nama_lengkap" class="block text-sm font-medium text-gray-700">Nama Lengkap Siswa</label>
+                            <input type="text" id="nama_lengkap" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+                            <input type="text" id="username" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700">Email Siswa (untuk login)</label>
+                            <input type="email" id="email" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label for="kelas" class="block text-sm font-medium text-gray-700">Kelas</label>
+                            <input type="text" id="kelas" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Contoh: 9 A">
+                        </div>
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                            <input type="password" id="password" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" minlength="6">
+                            <p class="text-xs text-gray-500 mt-1">Minimal 6 karakter.</p>
+                        </div>
 
-                    <div id="error-message" class="text-red-600 text-sm"></div>
-                    <div id="success-message" class="text-green-600 text-sm"></div>
+                        <div id="error-message" class="text-red-600 text-sm"></div>
+                        <div id="success-message" class="text-green-600 text-sm"></div>
 
 
-                    <div class="flex justify-end space-x-4">
-                        <a href="daftar-siswa.html" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Batal</a>
-                        <button type="submit" id="submit-button" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 font-semibold">Simpan Siswa</button>
-                    </div>
-                </form>
-            </div>
+                        <div class="flex justify-end space-x-4">
+                            <a href="daftar-siswa.html" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Batal</a>
+                            <button type="submit" id="submit-button" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 font-semibold">Simpan Siswa</button>
+                        </div>
+                    </form>
+                </div>
+            </main>
         </div>
     </div>
 
