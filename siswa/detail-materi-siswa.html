@@ -6,37 +6,35 @@
     <title>Detail Materi - Portal Belajar</title>
     
     <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
+    <script src="https://cdn.tailwindcss.com"></script>    
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        /* Styling untuk konten materi agar formatnya rapi */
-        .materi-content p {
+     <style> 
+        body { font-family: 'Inter', sans-serif; } 
+        /* PERUBAHAN 1: Style untuk merender konten HTML dari database */
+        #materi-konten-lengkap p {
             margin-bottom: 1rem;
             line-height: 1.75;
         }
-        .materi-content ul {
-            list-style-type: disc;
+        #materi-konten-lengkap ul, #materi-konten-lengkap ol {
             margin-left: 1.5rem;
             margin-bottom: 1rem;
+            list-style: revert;
         }
-        .materi-content ol {
-            list-style-type: decimal;
-            margin-left: 1.5rem;
-            margin-bottom: 1rem;
+        #materi-konten-lengkap img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         }
-        .materi-content h4 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-top: 2rem;
-            margin-bottom: 0.5rem;
+        #materi-konten-lengkap p[style*="text-align: center;"] {
+            display: flex;
+            justify-content: center;
         }
     </style>
 </head>
@@ -56,7 +54,7 @@
     </header>
 
      <!-- Main Content -->
-    <main class="container mx-auto px-6 py-12">
+     <main class="container mx-auto px-6 py-12">
         <div class="max-w-4xl mx-auto">
             <div class="mb-6">
                 <a href="materi-siswa.html" class="text-indigo-600 hover:underline">&larr; Kembali ke Daftar Materi</a>
@@ -68,7 +66,7 @@
 
             <article id="materi-content" class="hidden bg-white p-8 rounded-lg shadow-sm border">
                 <h1 id="materi-judul" class="text-3xl md:text-4xl font-bold text-gray-900 mb-6"></h1>
-                <div id="materi-konten-lengkap" class="prose max-w-none text-gray-700 leading-relaxed">
+                <div id="materi-konten-lengkap" class="prose max-w-none text-gray-700">
                     <!-- Konten lengkap materi akan dimuat di sini -->
                 </div>
 
@@ -96,8 +94,7 @@
         const materiLink = document.getElementById('materi-link');
 
         // Fungsi untuk mengambil dan menampilkan detail materi
-        async function fetchDetailMateri() {
-            // 1. Ambil ID materi dari URL
+        async function fetchDetailMateri() {           
             const params = new URLSearchParams(window.location.search);
             const materiId = params.get('id');
             if (!materiId) {
@@ -106,7 +103,6 @@
                 return;
             }
 
-            // 2. Ambil data materi dari Supabase berdasarkan ID
             const { data, error } = await supabase
                 .from('materi')
                 .select('judul, konten_lengkap, link_eksternal')
@@ -125,8 +121,7 @@
             // 3. Isi halaman dengan data yang didapat
             materiJudul.textContent = data.judul;
             // Menggunakan innerHTML agar tag seperti <p> dan <ul> bisa dirender
-            materiKontenLengkap.innerHTML = data.konten_lengkap.replace(/\n/g, '<br>');
-
+            materiKontenLengkap.innerHTML = data.konten_lengkap;
             // Tampilkan tombol link eksternal jika ada
             if (data.link_eksternal) {
                 materiLink.href = data.link_eksternal;

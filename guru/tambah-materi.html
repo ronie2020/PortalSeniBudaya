@@ -6,6 +6,7 @@
     <title>Tambah Materi Baru - Portal Guru</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tiny.cloud/1/ml18y10it45t3n1vlklu3miquciba311rgnst1kjavudg642/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -62,35 +63,35 @@
                 </div>
                 
                 <!-- Content Area: Form Lengkap -->
-                <div class="p-6">
-                    <form id="add-materi-form" class="bg-white p-8 rounded-lg shadow space-y-6">
-                        <div>
-                            <label for="judul" class="block text-sm font-medium text-gray-700">Judul Materi</label>
-                            <input type="text" id="judul" name="judul" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                        </div>
-                        <!-- PERUBAHAN DI SINI: Menambahkan input Kelas -->
-                        <div>
-                            <label for="kelas" class="block text-sm font-medium text-gray-700">Untuk Kelas</label>
-                            <input type="text" id="kelas" name="kelas" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" placeholder="Kosongkan untuk semua kelas, atau isi (Contoh: 9A)">
-                        </div>
-                        <div>
-                            <label for="deskripsi_singkat" class="block text-sm font-medium text-gray-700">Deskripsi Singkat</label>
-                            <textarea id="deskripsi_singkat" name="deskripsi_singkat" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Deskripsi ini akan tampil di halaman daftar materi untuk siswa."></textarea>
-                        </div>
-                        <div>
-                            <label for="konten_lengkap" class="block text-sm font-medium text-gray-700">Konten Lengkap Materi</label>
-                            <textarea id="konten_lengkap" name="konten_lengkap" rows="8" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Jelaskan isi materi pembelajaran secara lengkap di sini."></textarea>
-                        </div>
-                        <div>
-                            <label for="link_eksternal" class="block text-sm font-medium text-gray-700">Link Eksternal (Opsional)</label>
-                            <input type="url" id="link_eksternal" name="link_eksternal" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Tempelkan link dari Quizizz, Canva, YouTube, atau lainnya di sini.">
-                        </div>
-                        <div class="flex justify-end space-x-4">
-                            <a href="manajemen-materi.html" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Batal</a>
-                            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 font-semibold">Simpan Materi</button>
-                        </div>
-                    </form>
-                </div>
+                <div class="p-6 overflow-y-auto">
+                <form id="add-materi-form" class="bg-white p-8 rounded-lg shadow space-y-6">
+                    <div>
+                        <label for="judul" class="block text-sm font-medium text-gray-700">Judul Materi</label>
+                        <input type="text" id="judul" name="judul" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="kelas" class="block text-sm font-medium text-gray-700">Untuk Kelas</label>
+                        <input type="text" id="kelas" name="kelas" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" placeholder="Kosongkan untuk semua kelas, atau isi (Contoh: X IPA 1)">
+                    </div>
+                    <div>
+                        <label for="deskripsi_singkat" class="block text-sm font-medium text-gray-700">Deskripsi Singkat</label>
+                        <textarea id="deskripsi_singkat" name="deskripsi_singkat" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Deskripsi ini akan tampil di halaman daftar materi untuk siswa."></textarea>
+                    </div>
+                    <!-- PERUBAHAN 2: Mengganti textarea dengan div untuk editor -->
+                    <div>
+                        <label for="konten_lengkap" class="block text-sm font-medium text-gray-700">Konten Lengkap Materi</label>
+                        <div id="konten_lengkap" class="mt-1"></div>
+                    </div>
+                    <div>
+                        <label for="link_eksternal" class="block text-sm font-medium text-gray-700">Link Eksternal (Opsional)</label>
+                        <input type="url" id="link_eksternal" name="link_eksternal" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Tempelkan link dari YouTube, Canva, dll.">
+                    </div>
+                    <div class="flex justify-end space-x-4">
+                        <a href="manajemen-materi.html" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Batal</a>
+                        <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 font-semibold">Simpan Materi</button>
+                    </div>
+                </form>
+            </div>
             </main>
         </div>
     </div>
@@ -104,15 +105,24 @@
         const addMateriForm = document.getElementById('add-materi-form');
         let currentUser = null;
 
+        // PERUBAHAN 3: Inisialisasi TinyMCE
+        tinymce.init({
+            selector: '#konten_lengkap',
+            plugins: 'lists link image table code help wordcount',
+            toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+            height: 400,
+        });
+
         addMateriForm.addEventListener('submit', async (event) => {
             event.preventDefault();
             if (!currentUser) return;
 
+            // PERUBAHAN 4: Mengambil konten dari editor
             const materiData = {
                 judul: addMateriForm.judul.value,
-                kelas: addMateriForm.kelas.value || null, // Simpan null jika kosong
+                kelas: addMateriForm.kelas.value || null,
                 deskripsi_singkat: addMateriForm.deskripsi_singkat.value,
-                konten_lengkap: addMateriForm.konten_lengkap.value,
+                konten_lengkap: tinymce.get('konten_lengkap').getContent(),
                 link_eksternal: addMateriForm.link_eksternal.value,
                 user_id: currentUser.id
             };

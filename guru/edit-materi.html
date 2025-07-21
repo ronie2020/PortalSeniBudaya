@@ -6,6 +6,7 @@
     <title>Edit Materi - Portal Guru</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tiny.cloud/1/ml18y10it45t3n1vlklu3miquciba311rgnst1kjavudg642/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -62,7 +63,7 @@
             </div>
             
                   <!-- Content Area: Form Lengkap -->
-            <div class="p-6">
+            <div class="p-6 overflow-y-auto">
                 <form id="edit-materi-form" class="bg-white p-8 rounded-lg shadow space-y-6">
                     <p id="loading-form" class="text-gray-500">Memuat data materi...</p>
                     <div id="form-content" class="hidden space-y-6">
@@ -70,7 +71,6 @@
                             <label for="judul" class="block text-sm font-medium text-gray-700">Judul Materi</label>
                             <input type="text" id="judul" name="judul" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
                         </div>
-                        <!-- PERUBAHAN DI SINI: Menambahkan input Kelas -->
                         <div>
                             <label for="kelas" class="block text-sm font-medium text-gray-700">Untuk Kelas</label>
                             <input type="text" id="kelas" name="kelas" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" placeholder="Kosongkan untuk semua kelas, atau isi (Contoh: X IPA 1)">
@@ -81,11 +81,11 @@
                         </div>
                         <div>
                             <label for="konten_lengkap" class="block text-sm font-medium text-gray-700">Konten Lengkap Materi</label>
-                            <textarea id="konten_lengkap" name="konten_lengkap" rows="8" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Jelaskan isi materi pembelajaran secara lengkap di sini."></textarea>
+                            <div id="konten_lengkap" class="mt-1"></div>
                         </div>
                         <div>
                             <label for="link_eksternal" class="block text-sm font-medium text-gray-700">Link Eksternal (Opsional)</label>
-                            <input type="url" id="link_eksternal" name="link_eksternal" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Tempelkan link dari Quizizz, Canva, YouTube, atau lainnya di sini.">
+                            <input type="url" id="link_eksternal" name="link_eksternal" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Tempelkan link dari YouTube, Canva, dll.">
                         </div>
                         <div class="flex justify-end space-x-4">
                             <a href="manajemen-materi.html" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Batal</a>
@@ -107,11 +107,9 @@
         const editMateriForm = document.getElementById('edit-materi-form');
         const loadingFormElement = document.getElementById('loading-form');
         const formContentElement = document.getElementById('form-content');
-
         let materiId = null;
 
-        // Fungsi untuk mengambil data materi dan mengisi form
-        async function populateForm() {            
+        async function populateForm() {
             const params = new URLSearchParams(window.location.search);
             materiId = params.get('id');
             if (!materiId) {
@@ -120,50 +118,49 @@
                 return;
             }
 
-            // 2. Ambil data materi dari Supabase berdasarkan ID
-            const { data, error } = await supabase
-                .from('materi')
-                .select('*')
-                .eq('id', materiId)
-                .single(); // .single() untuk mendapatkan satu baris data
+            const { data, error } = await supabase.from('materi').select('*').eq('id', materiId).single();
 
             if (error || !data) {
-                console.error('Error fetching materi:', error);
                 alert('Gagal mengambil data materi.');
                 return;
             }
 
-            // 3. Isi form dengan data yang sudah ada
             editMateriForm.judul.value = data.judul;
             editMateriForm.kelas.value = data.kelas;
             editMateriForm.deskripsi_singkat.value = data.deskripsi_singkat;
-            editMateriForm.konten_lengkap.value = data.konten_lengkap;
             editMateriForm.link_eksternal.value = data.link_eksternal;
 
-            // Tampilkan form setelah data terisi
+            // Inisialisasi TinyMCE dengan konten yang sudah ada
+            tinymce.init({
+                selector: '#konten_lengkap',
+                plugins: 'lists link image table code help wordcount',
+                toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+                height: 400,
+                setup: function (editor) {
+                    editor.on('init', function () {
+                        editor.setContent(data.konten_lengkap || '');
+                    });
+                }
+            });
+
             loadingFormElement.style.display = 'none';
             formContentElement.classList.remove('hidden');
         }
 
-        // Fungsi untuk menangani update materi
         editMateriForm.addEventListener('submit', async (event) => {
             event.preventDefault();
 
             const updatedData = {
                 judul: editMateriForm.judul.value,
-                 kelas: editMateriForm.kelas.value || null, 
+                kelas: editMateriForm.kelas.value || null,
                 deskripsi_singkat: editMateriForm.deskripsi_singkat.value,
-                konten_lengkap: editMateriForm.konten_lengkap.value,
+                konten_lengkap: tinymce.get('konten_lengkap').getContent(),
                 link_eksternal: editMateriForm.link_eksternal.value,
             };
 
-            const { error } = await supabase
-                .from('materi')
-                .update(updatedData)
-                .eq('id', materiId);
+            const { error } = await supabase.from('materi').update(updatedData).eq('id', materiId);
 
             if (error) {
-                console.error('Error updating materi:', error);
                 alert('Gagal mengupdate materi: ' + error.message);
             } else {
                 alert('Materi berhasil diupdate!');
@@ -171,7 +168,6 @@
             }
         });
 
-        // Fungsi utama untuk inisialisasi halaman
         async function initializePage() {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) {
