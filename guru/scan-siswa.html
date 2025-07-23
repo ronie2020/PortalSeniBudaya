@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scan Absensi Siswa - Portal Guru</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style> 
+        body { font-family: 'Inter', sans-serif; } 
+        #video-container { position: relative; width: 100%; max-width: 500px; margin: auto; }
+        #video { width: 100%; height: auto; border-radius: 0.5rem; }
+        #scan-line { position: absolute; left: 0; right: 0; top: 50%; height: 2px; background: rgba(255, 0, 0, 0.7); box-shadow: 0 0 10px rgba(255, 0, 0, 0.7); animation: scanning 2s infinite linear; }
+        @keyframes scanning { 0% { top: 0%; } 50% { top: 100%; } 100% { top: 0%; } }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-xl font-bold text-indigo-600"><a href="manajemen-absen.html">&larr; Kembali</a></div>
+            <div><span id="display-name" class="font-semibold">Memuat...</span></div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-12">
+        <div class="max-w-xl mx-auto text-center">
+            <h1 id="sesi-judul" class="text-3xl font-bold text-gray-800">Memuat Sesi...</h1>
+            <p class="mt-2 text-gray-600">Arahkan kamera ke QR Code di kartu siswa untuk mencatat kehadiran.</p>
+            
+            <div id="video-container" class="mt-6 bg-black rounded-lg overflow-hidden shadow-lg">
+                <video id="video" playsinline></video>
+                <div id="scan-line"></div>
+            </div>
+            
+            <canvas id="canvas" class="hidden"></canvas>
+            
+            <div id="status-message" class="mt-6 p-4 rounded-lg font-semibold h-16"></div>
+
+            <div class="mt-6">
+                <h3 class="font-semibold text-lg">Siswa yang Baru Diabsen:</h3>
+                <ul id="recent-scans" class="mt-2 text-gray-600">
+                    <li>-</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+     <!-- JavaScript Logic -->
+    <script type="module">
+        import { supabase } from '../js/supabase-client.js';
+
+        const displayNameElement = document.getElementById('display-name');
+        const sesiJudulElement = document.getElementById('sesi-judul');
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const statusMessage = document.getElementById('status-message');
+        const recentScansList = document.getElementById('recent-scans');
+        
+        let currentUser = null;
+        let sesiId = null;
+        let isProcessing = false;
+
+        async function startScan() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+                video.srcObject = stream;
+                video.play();
+                requestAnimationFrame(tick);
+            } catch (err) {
+                statusMessage.textContent = "Gagal mengakses kamera. Pastikan Anda memberikan izin.";
+                statusMessage.className = 'p-4 rounded-lg font-semibold bg-red-100 text-red-700';
+            }
+        }
+
+        function tick() {
+            if (isProcessing) {
+                requestAnimationFrame(tick);
+                return;
+            }
+            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                const canvasContext = canvas.getContext("2d");
+                canvas.height = video.videoHeight;
+                canvas.width = video.videoWidth;
+                canvasContext.drawImage(video, 0, 0, canvas.width, canvas.height);
+                const imageData = canvasContext.getImageData(0, 0, canvas.width, canvas.height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "dontInvert" });
+
+                if (code) {
+                    processQRCode(code.data);
+                }
+            }
+            requestAnimationFrame(tick);
+        }
+
+        // **PERBAIKAN DI SINI: Pastikan 'scannedNisn' ada di dalam kurung**
+        async function processQRCode(scannedNisn) {
+            isProcessing = true;
+            statusMessage.textContent = `QR Code terdeteksi...`;
+            statusMessage.className = 'p-4 rounded-lg font-semibold bg-blue-100 text-blue-700';
+            
+            const { data: studentData, error: studentError } = await supabase
+                .from('users')
+                .select('id, nama_lengkap')
+                .eq('nisn', scannedNisn)
+                .single();
+
+            if (studentError || !studentData) {
+                statusMessage.textContent = 'QR Code siswa tidak valid atau tidak ditemukan.';
+                statusMessage.className = 'p-4 rounded-lg font-semibold bg-red-100 text-red-700';
+                setTimeout(() => { isProcessing = false; }, 2000);
+                return;
+            }
+
+            const { error: insertError } = await supabase.from('absen_rekap').insert({
+                sesi_id: sesiId,
+                user_id: studentData.id
+            });
+
+            if (insertError) {
+                statusMessage.textContent = `Gagal: ${studentData.nama_lengkap} sudah diabsen di sesi ini.`;
+                statusMessage.className = 'p-4 rounded-lg font-semibold bg-yellow-100 text-yellow-700';
+            } else {
+                statusMessage.textContent = `Berhasil: ${studentData.nama_lengkap} telah diabsen.`;
+                statusMessage.className = 'p-4 rounded-lg font-semibold bg-green-100 text-green-700';
+                
+                const listItem = document.createElement('li');
+                listItem.textContent = studentData.nama_lengkap;
+                if (recentScansList.children[0]?.textContent === '-') {
+                    recentScansList.innerHTML = '';
+                }
+                recentScansList.prepend(listItem);
+            }
+            
+            setTimeout(() => { isProcessing = false; }, 2000);
+        }
+
+        async function initializePage() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                window.location.href = '/login.html';
+                return;
+            }
+            currentUser = user;
+
+            const { data: profile } = await supabase.from('users').select('nama_lengkap').eq('id', user.id).single();
+            if (profile) {
+                displayNameElement.textContent = profile.nama_lengkap;
+            }
+
+            const params = new URLSearchParams(window.location.search);
+            sesiId = params.get('sesi_id');
+            if (!sesiId) {
+                alert('ID Sesi tidak ditemukan!');
+                window.location.href = 'manajemen-absen.html';
+                return;
+            }
+
+            const { data: sesiData, error: sesiError } = await supabase.from('absen_sesi').select('judul').eq('id', sesiId).single();
+            if (sesiError || !sesiData) {
+                alert('Gagal memuat data sesi.');
+                return;
+            }
+            sesiJudulElement.textContent = sesiData.judul;
+
+            await startScan();
+        }
+
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+</body>
+</html>

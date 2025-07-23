@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Siswa - Portal Guru</title>
+    <title>Edit Sesi Absensi - Portal Guru</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,10 +16,10 @@
     <div class="flex h-screen bg-gray-100">
         <!-- Sidebar -->
         <div class="hidden md:flex flex-col w-64 bg-white shadow-lg">
-             <div class="flex items-center justify-center h-20 shadow-md">
-               <a href="../index.html" class="text-2xl font-bold text-indigo-600">Portal Guru</a>
+            <div class="flex items-center justify-center h-20 shadow-md">
+                <h1 class="text-2xl font-bold text-indigo-600">Portal Guru</h1>
             </div>
-             <nav class="flex-1 px-4 py-4 space-y-2">
+           <nav class="flex-1 px-4 py-4 space-y-2">
                 <a href="dashboard-guru.html" class="flex items-center px-4 py-2 text-gray-600 hover:bg-indigo-100 hover:text-indigo-600 rounded-lg transition duration-200">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
                     Dashboard
@@ -34,7 +34,7 @@
                 </a>
                 <a href="manajemen-pengumuman.html" class="flex items-center px-4 py-2 text-gray-600 hover:bg-indigo-100 hover:text-indigo-600 rounded-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-2.236 9.168-5.584M13 18l5-5m0 0l-5-5m5 5H6" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-2.236 9.168-5.584M13 18l5-5m0 0l-5-5m5 5H6" />
                     </svg>
                     Manajemen Pengumuman
                 </a>
@@ -48,7 +48,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
                     Rekap Nilai
                 </a>
-                <a href="daftar-siswa.html" class="flex items-center px-4 py-2 text-white bg-indigo-600 rounded-lg">
+                <a href="daftar-siswa.html" class="flex items-center px-4 py-2 text-gray-600 hover:bg-indigo-100 hover:text-indigo-600 rounded-lg transition duration-200">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
                     Daftar Siswa
                 </a>
@@ -59,42 +59,37 @@
         <div class="flex flex-col flex-1 overflow-y-auto">
             <!-- Header -->
             <div class="flex items-center justify-between h-20 bg-white shadow-md px-6 sticky top-0">
-                <div class="text-2xl font-semibold text-gray-800">Edit Siswa</div>
+                <div class="text-2xl font-semibold text-gray-800">Edit Sesi Absensi</div>
                 <div class="flex items-center space-x-4">
                     <span class="text-gray-600">Selamat datang, <span id="display-name" class="font-semibold">Memuat...</span></span>
-                    <button id="logout-button" class="bg-red-500 text-white py-2 px-4 rounded-lg text-sm font-semibold hover:bg-red-600 transition duration-300">Logout</button>
+                    <button id="logout-button" class="text-sm text-red-500 hover:text-red-700 font-semibold">Logout</button>
                 </div>
             </div>
             
-            <!-- Content Area: Form Edit Siswa -->
+            <!-- Content Area -->
             <div class="p-6">
-                <form id="edit-student-form" class="bg-white p-8 rounded-lg shadow space-y-6">
-                    <p id="loading-form" class="text-gray-500">Memuat data siswa...</p>
+                <form id="edit-absen-form" class="bg-white p-8 rounded-lg shadow space-y-6">
+                    <p id="loading-form" class="text-gray-500">Memuat data...</p>
                     <div id="form-content" class="hidden space-y-6">
                         <div>
-                            <label for="nama_lengkap" class="block text-sm font-medium text-gray-700">Nama Lengkap Siswa</label>
-                            <input type="text" id="nama_lengkap" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                            <label for="judul" class="block text-sm font-medium text-gray-700">Judul Sesi</label>
+                            <input type="text" id="judul" name="judul" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
                         </div>
                         <div>
-                            <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
-                            <input type="text" id="username" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                            <label for="kelas" class="block text-sm font-medium text-gray-700">Untuk Kelas</label>
+                            <input type="text" id="kelas" name="kelas" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" placeholder="Kosongkan untuk semua kelas">
                         </div>
-                         <div>
-                            <label for="nisn" class="block text-sm font-medium text-gray-700">NISN</label>
-                            <input type="text" id="nisn" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                          <div>
+                            <label for="deskripsi" class="block text-sm font-medium text-gray-700">Deskripsi Kegiatan</label>
+                            <textarea id="deskripsi" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></textarea>
                         </div>
                         <div>
-                            <label for="kelas" class="block text-sm font-medium text-gray-700">Kelas</label>
-                            <input type="text" id="kelas" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Contoh: 9 A">
-                        </div>                       
-                        <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700">Email Siswa (tidak bisa diubah)</label>
-                            <input type="email" id="email" disabled class="mt-1 block w-full border-gray-300 rounded-md shadow-sm bg-gray-100 cursor-not-allowed">
+                            <label for="materi" class="block text-sm font-medium text-gray-700">Materi Kegiatan</label>
+                            <textarea id="materi" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></textarea>
                         </div>
-
                         <div class="flex justify-end space-x-4">
-                            <a href="daftar-siswa.html" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Batal</a>
-                            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 font-semibold">Update Siswa</button>
+                            <a href="manajemen-absen.html" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Batal</a>
+                            <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 font-semibold">Update Sesi</button>
                         </div>
                     </div>
                 </form>
@@ -102,71 +97,59 @@
         </div>
     </div>
 
-    <!-- JavaScript Logic -->
+   <!-- JavaScript Logic -->
     <script type="module">
         import { supabase } from '../js/supabase-client.js';
 
         const displayNameElement = document.getElementById('display-name');
         const logoutButton = document.getElementById('logout-button');
-        const editStudentForm = document.getElementById('edit-student-form');
+        const editAbsenForm = document.getElementById('edit-absen-form');
         const loadingFormElement = document.getElementById('loading-form');
         const formContentElement = document.getElementById('form-content');
-        let studentId = null;
+        let sesiId = null;
 
         async function populateForm() {
             const params = new URLSearchParams(window.location.search);
-            studentId = params.get('id');
-            if (!studentId) {
-                alert('ID siswa tidak ditemukan!');
-                window.location.href = 'daftar-siswa.html';
+            sesiId = params.get('id');
+            if (!sesiId) {
+                alert('ID sesi tidak ditemukan!');
+                window.location.href = 'manajemen-absen.html';
                 return;
             }
 
-            // PERBAIKAN DI SINI: Menggunakan select('*') untuk mengambil semua data
-            const { data: studentData, error: studentError } = await supabase
-                .from('users')
-                .select('*') 
-                .eq('id', studentId)
-                .single();
-            
-            if (studentError || !studentData) {
-                console.error("Gagal mengambil data siswa:", studentError);
-                alert('Gagal mengambil data profil siswa.');
+            const { data, error } = await supabase.from('absen_sesi').select('*').eq('id', sesiId).single();
+
+            if (error || !data) {
+                alert('Gagal mengambil data sesi.');
                 return;
             }
 
-            // Isi form
-            editStudentForm.nama_lengkap.value = studentData.nama_lengkap || '';
-            editStudentForm.username.value = studentData.username || '';
-            editStudentForm.kelas.value = studentData.kelas || '';
-            editStudentForm.nisn.value = studentData.nisn || '';
-            // Email tidak bisa diambil dari tabel 'users', jadi kita kosongkan
-            editStudentForm.email.placeholder = "Email tidak dapat diubah.";
+            editAbsenForm.judul.value = data.judul;
+            editAbsenForm.kelas.value = data.kelas;
+            editAbsenForm.deskripsi.value = data.deskripsi;
+            editAbsenForm.materi.value = data.materi;
 
             loadingFormElement.style.display = 'none';
             formContentElement.classList.remove('hidden');
         }
 
-        editStudentForm.addEventListener('submit', async (event) => {
+        editAbsenForm.addEventListener('submit', async (event) => {
             event.preventDefault();
 
             const updatedData = {
-                nama_lengkap: editStudentForm.nama_lengkap.value,
-                username: editStudentForm.username.value,
-                kelas: editStudentForm.kelas.value,
-                nisn: editStudentForm.nisn.value
+                judul: editAbsenForm.judul.value,
+                kelas: editAbsenForm.kelas.value || null,
+                deskripsi: editAbsenForm.deskripsi.value || null,
+                materi: editAbsenForm.materi.value || null,
             };
 
-            const { error } = await supabase
-                .from('users')
-                .update(updatedData)
-                .eq('id', studentId);
+            const { error } = await supabase.from('absen_sesi').update(updatedData).eq('id', sesiId);
 
             if (error) {
-                alert('Gagal mengupdate profil siswa: ' + error.message);
+                alert('Gagal mengupdate sesi: ' + error.message);
             } else {
-                alert('Profil siswa berhasil diupdate!');
-                window.location.href = 'daftar-siswa.html';
+                alert('Sesi berhasil diupdate!');
+                window.location.href = 'manajemen-absen.html';
             }
         });
 

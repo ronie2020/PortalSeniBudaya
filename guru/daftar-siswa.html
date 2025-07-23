@@ -38,6 +38,12 @@
                     </svg>
                     Manajemen Pengumuman
                 </a>
+                 <a href="manajemen-absen.html" class="flex items-center px-4 py-2 text-gray-600 hover:bg-indigo-100 hover:text-indigo-600 rounded-lg transition duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                    </svg>
+                    Manajemen Absensi
+                </a>
                 <a href="rekap-nilai.html" class="flex items-center px-4 py-2 text-gray-600 hover:bg-indigo-100 hover:text-indigo-600 rounded-lg transition duration-200">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
                     Rekap Nilai
@@ -51,7 +57,7 @@
 
         <!-- Main Content -->
         <div class="flex flex-col flex-1 overflow-y-auto">
-            <main class="container mx-auto px-auto py-auto">
+            <main class="flex flex-col flex- overflow-y-6">
                 <!-- Header -->
                 <div class="flex items-center justify-between h-20 bg-white shadow-md px-6 sticky top-0">
                     <div class="text-2xl font-semibold text-gray-800">Daftar Siswa</div>
@@ -95,6 +101,7 @@
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Lengkap</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NISN</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kelas</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Dibuat</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
@@ -111,7 +118,7 @@
     </div>
 
     <!-- JavaScript Logic -->
-    <script type="module">
+   <script type="module">
         import { supabase } from '../js/supabase-client.js';
 
         const displayNameElement = document.getElementById('display-name');
@@ -133,15 +140,11 @@
             }
         }
 
-        // Fungsi baru untuk mengisi dropdown filter kelas
         async function populateKelasFilter() {
             const { data, error } = await supabase.from('users').select('kelas');
-            if (error) {
-                console.error('Error fetching kelas list:', error);
-                return;
-            }
-            const kelasSet = new Set(data.map(item => item.kelas).filter(Boolean)); // Ambil kelas unik & hapus yg kosong
-            kelasFilter.innerHTML = '<option value="">Semua Kelas</option>'; // Reset
+            if (error) { console.error('Error fetching kelas list:', error); return; }
+            const kelasSet = new Set(data.map(item => item.kelas).filter(Boolean));
+            kelasFilter.innerHTML = '<option value="">Semua Kelas</option>';
             kelasSet.forEach(kelas => {
                 const option = document.createElement('option');
                 option.value = kelas;
@@ -150,19 +153,15 @@
             });
         }
 
-        // Fungsi fetchStudents sekarang menerima parameter filter
         async function fetchStudents(searchTerm = '', filterKelas = '') {
+            // PERBAIKAN DI SINI: Menggunakan select('*') untuk mengambil semua data
             let query = supabase
                 .from('users')
-                .select('id, nama_lengkap, username, kelas, created_at')
+                .select('*')
                 .eq('role', 'siswa');
 
-            if (searchTerm) {
-                query = query.ilike('nama_lengkap', `%${searchTerm}%`); // ilike untuk case-insensitive
-            }
-            if (filterKelas) {
-                query = query.eq('kelas', filterKelas);
-            }
+            if (searchTerm) { query = query.ilike('nama_lengkap', `%${searchTerm}%`); }
+            if (filterKelas) { query = query.eq('kelas', filterKelas); }
             
             query = query.order('created_at', { ascending: true });
 
@@ -173,12 +172,12 @@
 
             if (error) {
                 console.error('Error fetching students:', error);
-                studentListBody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-red-500">Gagal memuat data siswa.</td></tr>';
+                studentListBody.innerHTML = '<tr><td colspan="7" class="px-6 py-4 text-center text-red-500">Gagal memuat data siswa.</td></tr>';
                 return;
             }
 
             if (students.length === 0) {
-                studentListBody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">Tidak ada siswa yang cocok dengan kriteria.</td></tr>';
+                studentListBody.innerHTML = '<tr><td colspan="7" class="px-6 py-4 text-center text-gray-500">Tidak ada siswa yang cocok dengan kriteria.</td></tr>';
             } else {
                 students.forEach((student, index) => {
                     const studentRow = document.createElement('tr');
@@ -188,6 +187,7 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${index + 1}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${student.nama_lengkap}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${student.username}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${student.nisn || '-'}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${student.kelas || '-'}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${tglDibuat}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -206,28 +206,17 @@
             }
         }
 
-        // Fungsi utama untuk inisialisasi halaman
         async function initializePage() {
             const { data: { user } } = await supabase.auth.getUser();
-            if (!user) {
-                window.location.href = '/login.html';
-                return;
-            }
+            if (!user) { window.location.href = '/login.html'; return; }
             const { data: profile } = await supabase.from('users').select('nama_lengkap').eq('id', user.id).single();
-            if (profile) {
-                displayNameElement.textContent = profile.nama_lengkap;
-            }
+            if (profile) { displayNameElement.textContent = profile.nama_lengkap; }
             
             await populateKelasFilter();
             await fetchStudents();
 
-            // Tambahkan event listener untuk filter
-            searchInput.addEventListener('input', () => {
-                fetchStudents(searchInput.value, kelasFilter.value);
-            });
-            kelasFilter.addEventListener('change', () => {
-                fetchStudents(searchInput.value, kelasFilter.value);
-            });
+            searchInput.addEventListener('input', () => fetchStudents(searchInput.value, kelasFilter.value));
+            kelasFilter.addEventListener('change', () => fetchStudents(searchInput.value, kelasFilter.value));
         }
 
         logoutButton.addEventListener('click', async () => {
