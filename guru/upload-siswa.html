@@ -60,6 +60,7 @@
 
         <!-- Main Content -->
         <div class="flex flex-col flex-1 overflow-y-auto">
+            <main class="container overflow-y-auto">
             <!-- Header -->
             <div class="flex items-center justify-between h-20 bg-white shadow-md px-6 sticky top-0">
                 <div class="text-2xl font-semibold text-gray-800">Upload Daftar Siswa</div>
@@ -69,7 +70,7 @@
                 </div>
             </div>
             
-            <!-- Content Area -->
+           <!-- Content Area -->
             <div class="p-6">
                 <div class="bg-white p-8 rounded-lg shadow space-y-6 max-w-4xl mx-auto">
                     <div>
@@ -82,8 +83,9 @@
                     <div class="border-t pt-4">
                         <h4 class="font-semibold text-gray-800">Format Kolom yang Dibutuhkan:</h4>
                         <p class="text-sm text-gray-500">Pastikan baris pertama di file Anda adalah header dengan nama kolom persis seperti di bawah ini (huruf kecil semua):</p>
+                        <!-- PERUBAHAN DI SINI: Menambahkan 'nisn' ke instruksi -->
                         <div class="mt-2 p-3 bg-gray-100 rounded-md text-sm font-mono">
-                            nama_lengkap, username, kelas, email, password
+                            nama_lengkap, username, nisn, kelas, email, password
                         </div>
                     </div>
 
@@ -154,36 +156,33 @@
                 let successCount = 0;
                 let errorCount = 0;
 
-                // Simpan sesi guru saat ini
                 const { data: { session: guruSession } } = await supabase.auth.getSession();
 
                 for (const student of studentList) {
-                    const { nama_lengkap, username, kelas, email } = student;
-                    // **PERBAIKAN DI SINI: Mengubah password menjadi string**
+                    // PERUBAHAN DI SINI: Mengambil 'nisn' dari data
+                    const { nama_lengkap, username, nisn, kelas, email } = student;
                     const password = String(student.password);
-                    
-                    // Validasi data dasar
-                    if (!nama_lengkap || !email || !password) {
-                        resultLog.innerHTML += `<p class="text-red-500">- Gagal: Data tidak lengkap untuk ${email || 'salah satu baris'}.</p>`;
+
+                    if (!nama_lengkap || !email || !password || !nisn) {
+                        resultLog.innerHTML += `<p class="text-red-500">- Gagal: Data (nama, nisn, email, password) tidak lengkap untuk ${email || 'salah satu baris'}.</p>`;
                         errorCount++;
                         continue;
                     }
 
-                    // Daftarkan akun login
                     const { data: signUpData, error: signUpError } = await supabase.auth.signUp({ email, password });
 
                     if (signUpError) {
                         resultLog.innerHTML += `<p class="text-red-500">- Gagal mendaftarkan ${email}: ${signUpError.message}</p>`;
                         errorCount++;
                     } else {
-                        // Pulihkan sesi guru sebelum insert ke tabel users
                         await supabase.auth.setSession(guruSession);
                         
-                        // Tambahkan profil ke tabel users
+                        // PERUBAHAN DI SINI: Menambahkan 'nisn' saat insert
                         const { error: profileError } = await supabase.from('users').insert({
                             id: signUpData.user.id,
                             nama_lengkap,
                             username,
+                            nisn,
                             kelas,
                             role: 'siswa'
                         });
