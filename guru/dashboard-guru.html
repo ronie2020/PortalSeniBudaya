@@ -145,10 +145,10 @@
         }
         
         async function fetchRecentItems() {
-            const { data: materi, error: materiError } = await supabase.from('materi').select('id, judul, kelas').order('created_at', { ascending: false }).limit(5);
+            const { data: materi, error: materiError } = await supabase.from('materi').select('id, judul, kelas').order('created_at', { ascending: false }).limit(3);
             if (materiError) console.error("Error fetching recent materi:", materiError);
             
-            const { data: latihan, error: latihanError } = await supabase.from('latihan').select('id, judul, kelas').order('created_at', { ascending: false }).limit(5);
+            const { data: latihan, error: latihanError } = await supabase.from('latihan').select('id, judul, kelas').order('created_at', { ascending: false }).limit(3);
             if (latihanError) console.error("Error fetching recent latihan:", latihanError);
 
             recentMateriList.innerHTML = '';
