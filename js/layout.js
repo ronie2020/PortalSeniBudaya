@@ -1,35 +1,24 @@
 // File: js/layout.js
 export async function loadLayout() {
-    const pageContent = document.querySelector('body > .page-content');
+    const pageContentElement = document.querySelector('body > .page-content');
     const pageTitle = document.title.split(' - ')[0];
 
-    if (!pageContent) {
+    if (!pageContentElement) {
         console.error("Struktur Halaman Salah: Elemen dengan kelas '.page-content' tidak ditemukan.");
         return false;
     }
-    pageContent.remove();
+    const pageContentHTML = pageContentElement.innerHTML;
+    document.body.innerHTML = ''; // Kosongkan body untuk diisi layout
 
     try {
         const response = await fetch('_layout-guru.html');
         if (!response.ok) throw new Error('File _layout-guru.html tidak ditemukan.');
-        const layoutHtml = await response.text();
+        let layoutHTML = await response.text();
         
-        const parser = new DOMParser();
-        const layoutDoc = parser.parseFromString(layoutHtml, 'text/html');
-        const layoutWrapper = layoutDoc.body.children[0];
-
-        if (!layoutWrapper) {
-            throw new Error('Struktur layout utama (div pembungkus) tidak ditemukan di _layout-guru.html');
-        }
-
-        const mainContentContainer = layoutWrapper.querySelector('#main-content');
-        if (!mainContentContainer) {
-            throw new Error('Placeholder #main-content tidak ditemukan di dalam layout.');
-        }
-        mainContentContainer.appendChild(pageContent);
-
-        document.body.innerHTML = '';
-        document.body.appendChild(layoutWrapper);
+        // Ganti placeholder dengan konten halaman yang sebenarnya
+        layoutHTML = layoutHTML.replace('<!-- PAGE_CONTENT_PLACEHOLDER -->', pageContentHTML);
+        
+        document.body.innerHTML = layoutHTML;
         
         document.getElementById('page-title').textContent = pageTitle;
 
