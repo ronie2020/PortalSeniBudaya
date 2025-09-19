@@ -3,91 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kerjakan Latihan - Portal Seni Budaya</title>
-    <link rel="icon" type="image/png" href="../assets/images/favicon.ico">  
+    <title>Kerjakan Latihan - Portal Belajar</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style> 
         body { font-family: 'Inter', sans-serif; } 
-        /* Style untuk merender konten HTML dari database */
-        .soal-pertanyaan img {
-            max-width: 100%;
-            height: auto;
-            margin-top: 1rem;
-            margin-bottom: 1rem;
-            border-radius: 0.5rem;
-        }
+        .soal-pertanyaan img { max-width: 100%; height: auto; margin-top: 1rem; margin-bottom: 1rem; border-radius: 0.5rem; }
     </style>
 </head>
-<body class="bg-gray-50">
+<body>
 
-    <!-- Navbar -->
-    <header class="bg-white shadow-sm sticky top-0 z-10">
-        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="text-xl font-bold text-indigo-600">
-                <a href="/index.html">Portal Seni Budaya</a>
-            </div>
-            <div class="flex items-center space-x-4">
-                <span class="text-gray-700">Selamat datang, <span id="display-name" class="font-semibold">Memuat...</span></span>
-                <button id="logout-button" class="bg-red-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-600 transition">Logout</button>
-            </div>
-        </nav>
-    </header>
-
-    <!-- Main Content -->
-    <main class="container mx-auto px-6 py-12">
+    <div class="p-6">
         <div class="max-w-4xl mx-auto">
             <div class="mb-6">
                 <a href="tugas-siswa.html" class="text-indigo-600 hover:underline">&larr; Kembali ke Daftar Tugas</a>
             </div>
-
-            <div id="loading-latihan" class="text-center text-gray-600">
-                <p>Memuat latihan...</p>
-            </div>
-
+            <div id="loading-latihan" class="text-center text-gray-600"><p>Memuat latihan...</p></div>
             <div id="latihan-content" class="hidden">
-                <!-- Header Latihan -->
                 <div class="mb-8">
                     <h1 id="latihan-judul" class="text-3xl font-bold text-gray-900"></h1>
                     <p id="latihan-deskripsi" class="text-lg text-gray-600 mt-2"></p>
-                    <a id="latihan-link" href="#" target="_blank" class="hidden mt-2 text-indigo-600 hover:underline">Lihat Instruksi di Link Eksternal</a>
+                    <a id="latihan-link" href="#" target="_blank" class="hidden mt-2 text-indigo-600 hover:underline">Lihat Instruksi Eksternal</a>
                 </div>
-
-                <!-- Form Pengerjaan -->
                 <form id="form-pengerjaan">
-                    <!-- Kontainer untuk soal pilihan ganda -->
-                    <div id="soal-pg-container" class="space-y-8">
-                        <!-- Soal-soal akan dimuat di sini -->
-                    </div>
-
-                    <!-- Kontainer untuk pengumpulan file -->
+                    <div id="soal-pg-container" class="space-y-8"></div>
                     <div id="submission-container" class="hidden bg-white p-6 rounded-lg shadow-sm border">
                         <h3 class="font-semibold text-gray-800 mb-4">Pengumpulan Tugas</h3>
-                        <p class="text-sm text-gray-600 mb-4">Unggah file tugas Anda (misalnya: foto, PDF, atau dokumen). Pastikan file tidak lebih dari 5MB.</p>
+                        <p class="text-sm text-gray-600 mb-4">Unggah file tugas Anda (Maks. 5MB).</p>
                         <div>
-                            <label for="submission_file" class="block text-sm font-medium text-gray-700">Pilih File Tugas</label>
+                            <label for="submission_file" class="block text-sm font-medium text-gray-700">Pilih File</label>
                             <input type="file" id="submission_file" name="submission_file" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"/>
                         </div>
                     </div>
-
                     <div class="mt-10 pt-6 border-t border-gray-200">
-                        <button type="submit" id="submit-button" class="w-full md:w-auto px-8 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition shadow-lg">
-                            Kumpulkan Jawaban
-                        </button>
+                        <button type="submit" id="submit-button" class="w-full md:w-auto px-8 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 shadow-lg">Kumpulkan Jawaban</button>
                     </div>
                 </form>
             </div>
         </div>
-    </main>
-
-    <!-- JavaScript Logic -->
+    </div>
+    
+    <script type="module" src="../js/layout-siswa.js"></script>
     <script type="module">
         import { supabase } from '../js/supabase-client.js';
 
-        const displayNameElement = document.getElementById('display-name');
-        const logoutButton = document.getElementById('logout-button');
         const loadingLatihanElement = document.getElementById('loading-latihan');
         const latihanContentElement = document.getElementById('latihan-content');
         const latihanJudul = document.getElementById('latihan-judul');
@@ -97,9 +58,6 @@
         const submissionContainer = document.getElementById('submission-container');
         const formPengerjaan = document.getElementById('form-pengerjaan');
         const submitButton = document.getElementById('submit-button');
-
-        let currentUser = null;
-        let latihanId = null;
         let latihanData = null;
         let isFileSubmission = false;
 
@@ -113,129 +71,23 @@
                 return;
             }
             isFileSubmission = false;
-
             soalList.forEach((soal, index) => {
                 const soalCard = document.createElement('div');
                 soalCard.className = 'bg-white p-6 rounded-lg shadow-sm border';
-                let pilihanHtml = '';
-                soal.pilihan.forEach((pilihan, idx) => {
+                let pilihanHtml = soal.pilihan.map((pilihan, idx) => {
                     const pilihanValue = String.fromCharCode(65 + idx);
-                    pilihanHtml += `
-                        <label class="flex items-center p-3 rounded-lg border hover:bg-gray-50 cursor-pointer">
-                            <input type="radio" name="jawaban_soal_${index}" value="${pilihanValue}" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
-                            <span class="ml-3 text-gray-700">${pilihan}</span>
-                        </label>
-                    `;
-                });
-
-                // PERUBAHAN DI SINI: Menggunakan innerHTML untuk merender format dari editor
-                soalCard.innerHTML = `
-                    <div class="flex items-start">
-                        <span class="font-semibold text-gray-800 mr-2">${index + 1}.</span>
-                        <div class="soal-pertanyaan flex-1">${soal.pertanyaan}</div>
-                    </div>
-                    <div class="space-y-3 mt-4">
-                        ${pilihanHtml}
-                    </div>
-                `;
+                    return `<label class="flex items-center p-3 rounded-lg border hover:bg-gray-50 cursor-pointer"><input type="radio" name="jawaban_soal_${index}" value="${pilihanValue}" class="h-4 w-4 text-indigo-600"><span class="ml-3 text-gray-700">${pilihan}</span></label>`;
+                }).join('');
+                soalCard.innerHTML = `<div class="flex items-start"><span class="font-semibold mr-2">${index + 1}.</span><div class="soal-pertanyaan flex-1">${soal.pertanyaan}</div></div><div class="space-y-3 mt-4">${pilihanHtml}</div>`;
                 soalPgContainer.appendChild(soalCard);
             });
         }
 
-        formPengerjaan.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            if (!confirm('Apakah Anda yakin ingin mengumpulkan pekerjaan ini?')) return;
-            
-            submitButton.disabled = true;
-            submitButton.textContent = 'Mengunggah...';
-
-            let hasilData = {};
-
-            if (isFileSubmission) {
-                const fileInput = document.getElementById('submission_file');
-                const file = fileInput.files[0];
-
-                if (!file) {
-                    alert('Harap pilih file untuk diunggah.');
-                    submitButton.disabled = false;
-                    submitButton.textContent = 'Kumpulkan Tugas';
-                    return;
-                }
-
-                const filePath = `${currentUser.id}/${Date.now()}_${file.name}`;
-
-                const { error: uploadError } = await supabase.storage
-                    .from('file-tugas')
-                    .upload(filePath, file);
-
-                if (uploadError) {
-                    console.error('Error uploading file:', uploadError);
-                    alert('Gagal mengunggah file: ' + uploadError.message);
-                    submitButton.disabled = false;
-                    submitButton.textContent = 'Kumpulkan Tugas';
-                    return;
-                }
-
-                const { data: publicUrlData } = supabase.storage
-                    .from('file-tugas')
-                    .getPublicUrl(filePath);
-
-                hasilData = {
-                    user_id: currentUser.id,
-                    latihan_id: latihanId,
-                    submission_content: publicUrlData.publicUrl,
-                    nilai: null
-                };
-
-            } else {
-                let totalNilai = 0;
-                const jawabanSiswa = [];
-                latihanData.soal.forEach((soal, index) => {
-                    const pilihanSiswa = formPengerjaan.querySelector(`input[name="jawaban_soal_${index}"]:checked`);
-                    const jawaban = pilihanSiswa ? pilihanSiswa.value : null;
-                    jawabanSiswa.push({ pertanyaan: soal.pertanyaan, jawaban: jawaban });
-                    if (jawaban === soal.jawaban_benar) {
-                        totalNilai += soal.poin || 0;
-                    }
-                });
-                hasilData = {
-                    user_id: currentUser.id,
-                    latihan_id: latihanId,
-                    jawaban_siswa: jawabanSiswa,
-                    nilai: totalNilai
-                };
-            }
-
-            const { error: insertError } = await supabase.from('hasil_latihan').insert([hasilData]);
-
-            if (insertError) {
-                console.error('Error submitting hasil:', insertError);
-                alert('Gagal menyimpan jawaban Anda. Mungkin Anda sudah pernah mengerjakan latihan ini.');
-            } else {
-                alert(`Pekerjaan Anda telah berhasil dikumpulkan!`);
-                window.location.href = 'tugas-siswa.html';
-            }
-            submitButton.disabled = false;
-            submitButton.textContent = 'Kumpulkan Jawaban';
-        });
-
-        async function initializePage() {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) {
-                window.location.href = '/login.html';
-                return;
-            }
-            currentUser = user;
-
-            const { data: profile } = await supabase.from('users').select('nama_lengkap').eq('id', user.id).single();
-            if (profile) {
-                displayNameElement.textContent = profile.nama_lengkap;
-            }
-
+        async function initializePage(event) {
+            const { user } = event.detail;
             const params = new URLSearchParams(window.location.search);
-            latihanId = params.get('id');
+            const latihanId = params.get('id');
             if (!latihanId) {
-                alert('ID latihan tidak ditemukan!');
                 window.location.href = 'tugas-siswa.html';
                 return;
             }
@@ -246,26 +98,60 @@
                 return;
             }
             latihanData = data;
-
             latihanJudul.textContent = latihanData.judul;
             latihanDeskripsi.textContent = latihanData.deskripsi;
             if (latihanData.link_eksternal) {
                 latihanLink.href = latihanData.link_eksternal;
                 latihanLink.classList.remove('hidden');
             }
-
             displaySoal(latihanData.soal);
-
             loadingLatihanElement.style.display = 'none';
             latihanContentElement.classList.remove('hidden');
+
+            formPengerjaan.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (!confirm('Yakin ingin mengumpulkan pekerjaan ini?')) return;
+                submitButton.disabled = true;
+                submitButton.textContent = 'Mengunggah...';
+
+                let hasilData = {};
+                if (isFileSubmission) {
+                    const file = document.getElementById('submission_file').files[0];
+                    if (!file) {
+                        alert('Harap pilih file.');
+                        submitButton.disabled = false; submitButton.textContent = 'Kumpulkan Tugas'; return;
+                    }
+                    const filePath = `${user.id}/${Date.now()}_${file.name}`;
+                    const { error: uploadError } = await supabase.storage.from('file-tugas').upload(filePath, file);
+                    if (uploadError) {
+                        alert('Gagal unggah file: ' + uploadError.message);
+                        submitButton.disabled = false; submitButton.textContent = 'Kumpulkan Tugas'; return;
+                    }
+                    const { data: publicUrlData } = supabase.storage.from('file-tugas').getPublicUrl(filePath);
+                    hasilData = { user_id: user.id, latihan_id: latihanId, submission_content: publicUrlData.publicUrl, nilai: null };
+                } else {
+                    let totalNilai = 0;
+                    const jawabanSiswa = latihanData.soal.map((soal, index) => {
+                        const pilihanSiswa = formPengerjaan.querySelector(`input[name="jawaban_soal_${index}"]:checked`);
+                        const jawaban = pilihanSiswa ? pilihanSiswa.value : null;
+                        if (jawaban === soal.jawaban_benar) totalNilai += soal.poin || 0;
+                        return { pertanyaan: soal.pertanyaan, jawaban: jawaban };
+                    });
+                    hasilData = { user_id: user.id, latihan_id: latihanId, jawaban_siswa: jawabanSiswa, nilai: totalNilai };
+                }
+
+                const { error: insertError } = await supabase.from('hasil_latihan').insert([hasilData]);
+                if (insertError) {
+                    alert('Gagal menyimpan. Anda mungkin sudah mengerjakan latihan ini.');
+                } else {
+                    alert('Pekerjaan Anda berhasil dikumpulkan!');
+                    window.location.href = 'tugas-siswa.html';
+                }
+                submitButton.disabled = false;
+                submitButton.textContent = 'Kumpulkan Jawaban';
+            });
         }
-
-        logoutButton.addEventListener('click', async () => {
-            await supabase.auth.signOut();
-            window.location.href = '/login.html';
-        });
-
-        document.addEventListener('DOMContentLoaded', initializePage);
+        document.addEventListener('layoutReady', initializePage);
     </script>
 </body>
 </html>

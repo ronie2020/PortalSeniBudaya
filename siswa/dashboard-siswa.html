@@ -4,76 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Siswa - Portal Belajar</title>
-    <link rel="icon" type="image/png" href="../assets/images/favicon.ico">  
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style> body { font-family: 'Inter', sans-serif; } </style>
 </head>
-<body class="bg-gray-50">
+<body>
 
-    <!-- Navbar -->
-    <header class="bg-white shadow-sm sticky top-0 z-10">
-        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="text-xl font-bold text-indigo-600">
-                <a href="/index.html">Portal Belajar</a>
-            </div>
-            <div class="flex items-center space-x-4">
-                <span class="text-gray-700">Selamat datang, <span id="display-name" class="font-semibold">Memuat...</span></span>
-                <button id="logout-button" class="bg-red-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-600 transition">Logout</button>
-            </div>
-        </nav>
-    </header>
-
-    <!-- Main Content -->
-    <main class="container mx-auto px-6 py-12">
-        <!-- Navigation Tabs -->
-        <div class="mb-8 border-b border-gray-200">
-            <nav class="flex justify-center space-x-8" aria-label="Tabs">
-                <a href="dashboard-siswa.html" class="pb-4 px-1 font-medium text-indigo-600 border-b-2 border-indigo-500 whitespace-nowrap" aria-current="page">Dashboard</a>
-                <a href="materi-siswa.html" class="pb-4 px-1 text-gray-500 hover:text-indigo-600 hover:border-indigo-500 whitespace-nowrap">Materi Pembelajaran</a>
-                <a href="tugas-siswa.html" class="pb-4 px-1 text-gray-500 hover:text-indigo-600 hover:border-indigo-500 whitespace-nowrap">Tugas & Latihan</a>
-                <a href="nilai-siswa.html" class="pb-4 px-1 text-gray-500 hover:text-indigo-600 hover:border-indigo-500 whitespace-nowrap">Nilai Saya</a>
-            </nav>
-        </div>
-
-          <!-- Welcome Section -->
-        <section class="mb-10">
-            <h1 id="welcome-message" class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Memuat...</h1>
+    <!-- KONTEN INTI UNTUK HALAMAN INI -->
+    <div class="p-6">
+        <section class="mb-8">
+            <h1 id="welcome-message" class="text-3xl font-bold text-gray-900 mb-2">Memuat...</h1>
             <p class="text-lg text-gray-600">Selamat belajar dan tetap semangat mengerjakan tugas-tugasmu.</p>
-            <!-- Tombol Baru untuk Scan Absen -->
-             <div class="mt-6 flex flex-wrap gap-4">
-                <a href="scan-absen-siswa.html" class="px-6 py-3 bg-teal-500 text-white font-semibold rounded-lg hover:bg-teal-600 transition shadow">
-                    Scan QR Code Absensi
-                </a>
-                <!-- Tombol Baru untuk Kartu Siswa -->
-                <a href="kartu-siswa.html" class="px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition shadow">
-                    Lihat Kartu Siswa Saya
-                </a>
-            </div>
         </section>
-        
 
-        <!-- Pengumuman -->
-        <section id="pengumuman-section" class="mb-10">
+        <section id="pengumuman-section" class="mb-8">
             <h2 class="text-2xl font-bold text-gray-800 mb-4">Pengumuman Terbaru</h2>
             <div id="pengumuman-list" class="space-y-4">
                 <p class="text-gray-500">Memuat pengumuman...</p>
             </div>
         </section>
 
-        <!-- Dynamic Content Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- Tugas yang Perlu Dikerjakan -->
             <section>
-                <h2 class="text-2xl font-bold text-gray-800 mb-4">Tugas yang Perlu Dikerjakan</h2>
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Tugas Perlu Dikerjakan</h2>
                 <div id="tugas-list" class="space-y-4">
                     <p class="text-gray-500">Memuat tugas...</p>
                 </div>
             </section>
-            
-            <!-- Materi Terbaru -->
             <section>
                 <h2 class="text-2xl font-bold text-gray-800 mb-4">Materi Terbaru</h2>
                 <div id="materi-list" class="space-y-4">
@@ -81,24 +40,19 @@
                 </div>
             </section>
         </div>
-    </main>
+    </div>
 
-    <!-- JavaScript Logic -->
+    <!-- Panggil Layout & Skrip Halaman -->
+    <script type="module" src="../js/layout-siswa.js"></script>
     <script type="module">
         import { supabase } from '../js/supabase-client.js';
 
-        const displayNameElement = document.getElementById('display-name');
         const welcomeMessageElement = document.getElementById('welcome-message');
-        const logoutButton = document.getElementById('logout-button');
         const tugasListContainer = document.getElementById('tugas-list');
         const materiListContainer = document.getElementById('materi-list');
         const pengumumanListContainer = document.getElementById('pengumuman-list');
-        
-        let currentUser = null;
-        let userProfile = null;
 
-        // Fungsi untuk mengambil pengumuman
-        async function fetchAnnouncements() {
+        async function fetchAnnouncements(userProfile) {
             const { data, error } = await supabase
                 .from('pengumuman')
                 .select('*')
@@ -108,145 +62,70 @@
 
             pengumumanListContainer.innerHTML = '';
             if (error) {
-                console.error("Error fetching announcements:", error);
                 pengumumanListContainer.innerHTML = '<p class="text-red-500">Gagal memuat pengumuman.</p>';
                 return;
             }
 
             if (data && data.length > 0) {
                 data.forEach(item => {
-                    const tgl = new Date(item.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+                    const tgl = new Date(item.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long' });
                     const card = document.createElement('div');
                     card.className = 'bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg';
-                    card.innerHTML = `
-                        <h3 class="font-bold text-blue-800">${item.judul}</h3>
-                        <p class="text-xs text-gray-500 mb-2">Diposting pada ${tgl} - Untuk Kelas: ${item.kelas || 'Semua'}</p>
-                        <p class="text-gray-700 whitespace-pre-wrap">${item.isi}</p>
-                    `;
+                    card.innerHTML = `<h3 class="font-bold text-blue-800">${item.judul}</h3><p class="text-xs text-gray-500 mb-2">Diposting: ${tgl}</p><p class="text-gray-700">${item.isi}</p>`;
                     pengumumanListContainer.appendChild(card);
                 });
             } else {
-                // Sembunyikan seluruh bagian pengumuman jika tidak ada
                 document.getElementById('pengumuman-section').style.display = 'none';
             }
         }
 
-        // **PERBAIKAN DI SINI: Mengisi kembali fungsi populateDashboard**
-        async function populateDashboard() {
-            // --- Ambil Tugas yang Belum Dikerjakan ---
-            const { data: hasilSiswa } = await supabase
-                .from('hasil_latihan')
-                .select('latihan_id')
-                .eq('user_id', currentUser.id);
-
+        async function populateDashboard(currentUser, userProfile) {
+            const { data: hasilSiswa } = await supabase.from('hasil_latihan').select('latihan_id').eq('user_id', currentUser.id);
             const idLatihanSudahDikerjakan = hasilSiswa ? hasilSiswa.map(h => h.latihan_id) : [];
             
-            const { data: semuaLatihan, error: latihanError } = await supabase
-                .from('latihan')
-                .select('*')
-                .or(`kelas.eq.${userProfile.kelas},kelas.is.null`)
-                .order('batas_waktu', { ascending: true, nullsFirst: false })
-                .limit(5);
-
-            if (latihanError) console.error("Error fetching latihan:", latihanError);
-
+            const { data: semuaLatihan } = await supabase.from('latihan').select('*').or(`kelas.eq.${userProfile.kelas},kelas.is.null`).order('batas_waktu', { ascending: true, nullsFirst: false }).limit(5);
             const latihanBelumDikerjakan = semuaLatihan ? semuaLatihan.filter(l => !idLatihanSudahDikerjakan.includes(l.id)) : [];
 
             tugasListContainer.innerHTML = '';
             if (latihanBelumDikerjakan.length > 0) {
                 latihanBelumDikerjakan.forEach(latihan => {
-                    const tugasCard = document.createElement('div');
-                    tugasCard.className = 'bg-white p-4 rounded-lg shadow-sm border flex justify-between items-center';
+                    const card = document.createElement('div');
+                    card.className = 'bg-white p-4 rounded-lg shadow-sm border flex justify-between items-center';
                     let batasWaktuText = 'Tidak ada batas waktu';
-                    let batasWaktuColorClass = 'text-gray-500';
-                    if (latihan.batas_waktu) {
-                        const batasWaktuDate = new Date(latihan.batas_waktu);
-                        if (batasWaktuDate < new Date()) {
-                            batasWaktuColorClass = 'text-red-600 font-semibold';
-                        }
-                        batasWaktuText = `Batas waktu: ${batasWaktuDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })} ${batasWaktuDate.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}`;
-                    }
-                    tugasCard.innerHTML = `
-                        <div>
-                            <h3 class="font-semibold text-gray-800">${latihan.judul}</h3>
-                            <p class="text-sm mt-1 ${batasWaktuColorClass}">${batasWaktuText}</p>
-                        </div>
-                        <a href="kerjakan-latihan.html?id=${latihan.id}" class="px-5 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 transition">
-                            Kerjakan
-                        </a>
-                    `;
-                    tugasListContainer.appendChild(tugasCard);
+                    if (latihan.batas_waktu) batasWaktuText = `Batas: ${new Date(latihan.batas_waktu).toLocaleString('id-ID')}`;
+                    card.innerHTML = `<div><h3 class="font-semibold text-gray-800">${latihan.judul}</h3><p class="text-sm mt-1 text-gray-500">${batasWaktuText}</p></div><a href="kerjakan-latihan.html?id=${latihan.id}" class="px-5 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700">Kerjakan</a>`;
+                    tugasListContainer.appendChild(card);
                 });
             } else {
-                tugasListContainer.innerHTML = '<p class="text-gray-500">Kerja bagus! Tidak ada tugas yang perlu dikerjakan.</p>';
+                tugasListContainer.innerHTML = '<p class="text-gray-500">Kerja bagus! Tidak ada tugas.</p>';
             }
 
-            // --- Ambil Materi Terbaru ---
-            const { data: materi, error: materiError } = await supabase
-                .from('materi')
-                .select('*')
-                .or(`kelas.eq.${userProfile.kelas},kelas.is.null`)
-                .order('created_at', { ascending: false })
-                .limit(5);
-
-            if (materiError) console.error("Error fetching materi:", materiError);
-
+            const { data: materi } = await supabase.from('materi').select('*').or(`kelas.eq.${userProfile.kelas},kelas.is.null`).order('created_at', { ascending: false }).limit(5);
             materiListContainer.innerHTML = '';
             if (materi && materi.length > 0) {
                 materi.forEach(item => {
-                    const materiCard = document.createElement('div');
-                    materiCard.className = 'bg-white p-4 rounded-lg shadow-sm border flex justify-between items-center';
-                    materiCard.innerHTML = `
-                        <div>
-                            <h3 class="font-semibold text-gray-800">${item.judul}</h3>
-                            <p class="text-sm text-gray-500 mt-1">Kelas: ${item.kelas || 'Umum'}</p>
-                        </div>
-                        <a href="detail-materi-siswa.html?id=${item.id}" class="px-5 py-2 bg-gray-100 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-200 transition">
-                            Baca
-                        </a>
-                    `;
-                    materiListContainer.appendChild(materiCard);
+                    const card = document.createElement('div');
+                    card.className = 'bg-white p-4 rounded-lg shadow-sm border flex justify-between items-center';
+                    card.innerHTML = `<div><h3 class="font-semibold text-gray-800">${item.judul}</h3><p class="text-sm text-gray-500 mt-1">Kelas: ${item.kelas || 'Umum'}</p></div><a href="detail-materi-siswa.html?id=${item.id}" class="px-5 py-2 bg-gray-100 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-200">Baca</a>`;
+                    materiListContainer.appendChild(card);
                 });
             } else {
-                materiListContainer.innerHTML = '<p class="text-gray-500">Belum ada materi pembelajaran yang tersedia.</p>';
+                materiListContainer.innerHTML = '<p class="text-gray-500">Belum ada materi tersedia.</p>';
             }
         }
 
-        // Fungsi utama untuk inisialisasi halaman
-        async function initializePage() {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) {
-                window.location.href = '/login.html';
-                return;
+        function initializePage(event) {
+            const { user, profile } = event.detail;
+            if (profile) {
+                welcomeMessageElement.textContent = `Halo, ${profile.username}!`;
+                fetchAnnouncements(profile);
+                populateDashboard(user, profile);
+            } else {
+                welcomeMessageElement.textContent = 'Gagal memuat data profil.';
             }
-            currentUser = user;
-
-            const { data: profile, error: profileError } = await supabase
-                .from('users')
-                .select('nama_lengkap, username, kelas')
-                .eq('id', user.id)
-                .single();
-            
-            if (profileError || !profile) {
-                 console.error("Gagal mengambil profil siswa:", profileError);
-                 return;
-            }
-            
-            userProfile = profile;
-            displayNameElement.textContent = userProfile.nama_lengkap;
-            welcomeMessageElement.textContent = `Halo, ${userProfile.username}!`;
-
-            // Panggil semua fungsi untuk memuat data
-            await fetchAnnouncements();
-            await populateDashboard();
         }
 
-        logoutButton.addEventListener('click', async () => {
-            await supabase.auth.signOut();
-            window.location.href = '/login.html';
-        });
-
-        document.addEventListener('DOMContentLoaded', initializePage);
+        document.addEventListener('layoutReady', initializePage);
     </script>
 </body>
 </html>

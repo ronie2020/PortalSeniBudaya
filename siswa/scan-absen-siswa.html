@@ -4,157 +4,94 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scan Absensi - Portal Siswa</title>
-    <link rel="icon" type="image/png" href="../assets/images/favicon.ico">  
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Library untuk memindai QR Code dari kamera -->
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style> 
         body { font-family: 'Inter', sans-serif; } 
-        #video-container {
-            position: relative;
-            width: 100%;
-            max-width: 500px;
-            margin: auto;
-        }
-        #video {
-            width: 100%;
-            height: auto;
-            border-radius: 0.5rem;
-        }
-        #scan-line {
-            position: absolute;
-            left: 0;
-            right: 0;
-            top: 50%;
-            height: 2px;
-            background: rgba(255, 0, 0, 0.7);
-            box-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
-            animation: scanning 2s infinite linear;
-        }
-        @keyframes scanning {
-            0% { top: 0%; }
-            50% { top: 100%; }
-            100% { top: 0%; }
-        }
+        #video-container { position: relative; width: 100%; max-width: 500px; margin: auto; }
+        #video { width: 100%; height: auto; border-radius: 0.5rem; }
+        #scan-line { position: absolute; left: 0; right: 0; top: 50%; height: 2px; background: rgba(255, 0, 0, 0.7); animation: scanning 2s infinite linear; }
+        @keyframes scanning { 0% { top: 0%; } 50% { top: 100%; } 100% { top: 0%; } }
     </style>
 </head>
-<body class="bg-gray-100">
-
-    <!-- Navbar -->
-    <header class="bg-white shadow-sm">
-        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="text-xl font-bold text-indigo-600"><a href="dashboard-siswa.html">Portal Siswa</a></div>
-            <div><span id="display-name" class="font-semibold">Memuat...</span></div>
-        </nav>
-    </header>
-
-    <!-- Main Content -->
-    <main class="container mx-auto px-6 py-12">
-        <div class="mb-6">
-                <a href="dashboard-siswa.html" class="text-indigo-600 hover:underline">&larr; Kembali ke Dashboard</a>
-            </div>
+<body>
+    <div class="p-6">
         <div class="max-w-xl mx-auto text-center">
             <h1 class="text-3xl font-bold text-gray-800">Absensi QR Code</h1>
-            <p class="mt-2 text-gray-600">Arahkan kamera Anda ke QR Code yang ditampilkan oleh guru.</p>
-            
+            <p class="mt-2 text-gray-600">Arahkan kamera ke QR Code yang ditampilkan guru.</p>
             <div id="video-container" class="mt-6 bg-black rounded-lg overflow-hidden shadow-lg">
                 <video id="video" playsinline></video>
                 <div id="scan-line"></div>
             </div>
-            
             <canvas id="canvas" class="hidden"></canvas>
-            
             <div id="status-message" class="mt-6 p-4 rounded-lg font-semibold"></div>
         </div>
-    </main>
+    </div>
 
-    <!-- JavaScript Logic -->
+    <script type="module" src="../js/layout-siswa.js"></script>
     <script type="module">
         import { supabase } from '../js/supabase-client.js';
 
-        const displayNameElement = document.getElementById('display-name');
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const statusMessage = document.getElementById('status-message');
-        let currentUser = null;
 
-        async function startScan() {
+        async function startScan(user) {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
                 video.srcObject = stream;
-                video.setAttribute("playsinline", true); // Required to work on iOS
                 video.play();
-                requestAnimationFrame(tick);
+                requestAnimationFrame(() => tick(user));
             } catch (err) {
-                console.error("Error accessing camera:", err);
-                statusMessage.textContent = "Gagal mengakses kamera. Pastikan Anda memberikan izin.";
+                statusMessage.textContent = "Gagal mengakses kamera. Pastikan Anda memberi izin.";
                 statusMessage.className = 'p-4 rounded-lg font-semibold bg-red-100 text-red-700';
             }
         }
 
-        function tick() {
+        async function processQRCode(sesiId, user) {
+            statusMessage.textContent = `QR Code terdeteksi. Memproses...`;
+            statusMessage.className = 'p-4 rounded-lg font-semibold bg-blue-100 text-blue-700';
+
+            const { error } = await supabase.from('absen_rekap').insert({ sesi_id: sesiId, user_id: user.id });
+            if (error) {
+                statusMessage.textContent = 'Gagal, mungkin Anda sudah absen di sesi ini.';
+                statusMessage.className = 'p-4 rounded-lg font-semibold bg-red-100 text-red-700';
+            } else {
+                statusMessage.textContent = 'Absensi berhasil! Anda akan diarahkan kembali.';
+                statusMessage.className = 'p-4 rounded-lg font-semibold bg-green-100 text-green-700';
+                setTimeout(() => { window.location.href = 'dashboard-siswa.html'; }, 2000);
+            }
+        }
+
+        function tick(user) {
             if (video.readyState === video.HAVE_ENOUGH_DATA) {
                 const canvasContext = canvas.getContext("2d");
                 canvas.height = video.videoHeight;
                 canvas.width = video.videoWidth;
                 canvasContext.drawImage(video, 0, 0, canvas.width, canvas.height);
                 const imageData = canvasContext.getImageData(0, 0, canvas.width, canvas.height);
-                const code = jsQR(imageData.data, imageData.width, imageData.height, {
-                    inversionAttempts: "dontInvert",
-                });
+                const code = jsQR(imageData.data, imageData.width, imageData.height);
 
                 if (code) {
-                    // QR Code terdeteksi! Hentikan scan dan proses.
                     video.srcObject.getTracks().forEach(track => track.stop());
-                    processQRCode(code.data);
+                    processQRCode(code.data, user);
                     return;
                 }
             }
-            requestAnimationFrame(tick);
+            requestAnimationFrame(() => tick(user));
         }
 
-        async function processQRCode(sesiId) {
-            statusMessage.textContent = `QR Code terdeteksi (${sesiId}). Memproses absensi...`;
-            statusMessage.className = 'p-4 rounded-lg font-semibold bg-blue-100 text-blue-700';
-
-            const { error } = await supabase.from('absen_rekap').insert({
-                sesi_id: sesiId,
-                user_id: currentUser.id
-            });
-
-            if (error) {
-                console.error("Error inserting attendance:", error);
-                statusMessage.textContent = 'Gagal melakukan absensi. Mungkin Anda sudah absen di sesi ini.';
-                statusMessage.className = 'p-4 rounded-lg font-semibold bg-red-100 text-red-700';
-            } else {
-                statusMessage.textContent = 'Absensi berhasil! Anda akan diarahkan kembali.';
-                statusMessage.className = 'p-4 rounded-lg font-semibold bg-green-100 text-green-700';
-                setTimeout(() => {
-                    window.location.href = 'dashboard-siswa.html';
-                }, 2000);
+        function initializePage(event) {
+            const { user } = event.detail;
+            if (user) {
+                startScan(user);
             }
         }
 
-        async function initializePage() {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) {
-                window.location.href = '/login.html';
-                return;
-            }
-            currentUser = user;
-
-            const { data: profile } = await supabase.from('users').select('nama_lengkap').eq('id', user.id).single();
-            if (profile) {
-                displayNameElement.textContent = profile.nama_lengkap;
-            }
-            await startScan();
-        }
-
-        document.addEventListener('DOMContentLoaded', initializePage);
+        document.addEventListener('layoutReady', initializePage);
     </script>
 </body>
 </html>

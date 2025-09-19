@@ -4,88 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detail Materi - Portal Belajar</title>
-    <link rel="icon" type="image/png" href="../assets/images/favicon.ico">  
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>    
-    <!-- Google Fonts: Inter -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-     <style> 
-        body { font-family: 'Inter', sans-serif; } 
-        /* PERUBAHAN 1: Style untuk merender konten HTML dari database */
-        #materi-konten-lengkap p {
-            margin-bottom: 1rem;
-            line-height: 1.75;
-        }
-        #materi-konten-lengkap ul, #materi-konten-lengkap ol {
-            margin-left: 1.5rem;
-            margin-bottom: 1rem;
-            list-style: revert;
-        }
-        #materi-konten-lengkap img {
-            max-width: 100%;
-            height: auto;
-            margin-top: 1.5rem;
-            margin-bottom: 1.5rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-        }
-        #materi-konten-lengkap p[style*="text-align: center;"] {
-            display: flex;
-            justify-content: center;
-        }
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        #materi-konten-lengkap p { margin-bottom: 1rem; line-height: 1.75; }
+        #materi-konten-lengkap ul, #materi-konten-lengkap ol { margin-left: 1.5rem; margin-bottom: 1rem; list-style: revert; }
+        #materi-konten-lengkap img { max-width: 100%; height: auto; margin-top: 1.5rem; margin-bottom: 1.5rem; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); }
     </style>
 </head>
-<body class="bg-gray-50">
+<body>
 
-    <!-- Header Siswa -->
-    <header class="bg-white shadow-sm sticky top-0 z-10">
-        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="text-xl font-bold text-indigo-600">
-                <a href="dashboard-siswa.html">Portal Belajar</a>
-            </div>
-            <div class="flex items-center space-x-4">
-                <span class="text-gray-700">Selamat datang, <span id="display-name" class="font-semibold">Memuat...</span></span>
-                <button id="logout-button" class="bg-red-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-600 transition">Logout</button>
-            </div>
-        </nav>
-    </header>
-
-     <!-- Main Content -->
-     <main class="container mx-auto px-6 py-12">
+    <div class="p-6">
         <div class="max-w-4xl mx-auto">
             <div class="mb-6">
                 <a href="materi-siswa.html" class="text-indigo-600 hover:underline">&larr; Kembali ke Daftar Materi</a>
             </div>
-
-            <div id="loading-materi" class="text-center text-gray-600">
-                <p>Memuat materi...</p>
-            </div>
-
-            <article id="materi-content" class="hidden bg-white p-8 rounded-lg shadow-sm border">
+            <div id="loading-materi" class="text-center text-gray-600"><p>Memuat materi...</p></div>
+            <article id="materi-content" class="hidden bg-white p-8 rounded-lg shadow-md border">
                 <h1 id="materi-judul" class="text-3xl md:text-4xl font-bold text-gray-900 mb-6"></h1>
-                <div id="materi-konten-lengkap" class="prose max-w-none text-gray-700">
-                    <!-- Konten lengkap materi akan dimuat di sini -->
-                </div>
-
+                <div id="materi-konten-lengkap" class="prose max-w-none text-gray-700"></div>
                 <div id="materi-tambahan-container" class="hidden mt-8 pt-6 border-t">
                     <h2 class="text-xl font-bold text-gray-800 mb-4">Materi Tambahan</h2>
-                    <a id="materi-link" href="#" target="_blank" class="inline-block px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition">
-                        Lihat Materi di Link Eksternal
-                    </a>
+                    <a id="materi-link" href="#" target="_blank" class="inline-block px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700">Lihat di Link Eksternal</a>
                 </div>
             </article>
         </div>
-    </main>
+    </div>
 
-     <!-- JavaScript Logic -->
+    <script type="module" src="../js/layout-siswa.js"></script>
     <script type="module">
         import { supabase } from '../js/supabase-client.js';
 
-        const displayNameElement = document.getElementById('display-name');
-        const logoutButton = document.getElementById('logout-button');
         const loadingMateriElement = document.getElementById('loading-materi');
         const materiContentElement = document.getElementById('materi-content');
         const materiJudul = document.getElementById('materi-judul');
@@ -93,65 +45,33 @@
         const materiTambahanContainer = document.getElementById('materi-tambahan-container');
         const materiLink = document.getElementById('materi-link');
 
-        // Fungsi untuk mengambil dan menampilkan detail materi
-        async function fetchDetailMateri() {           
+        async function fetchDetailMateri() {
             const params = new URLSearchParams(window.location.search);
             const materiId = params.get('id');
             if (!materiId) {
-                alert('ID materi tidak ditemukan!');
                 window.location.href = 'materi-siswa.html';
                 return;
             }
 
-            const { data, error } = await supabase
-                .from('materi')
-                .select('judul, konten_lengkap, link_eksternal')
-                .eq('id', materiId)
-                .single();
-
+            const { data, error } = await supabase.from('materi').select('judul, konten_lengkap, link_eksternal').eq('id', materiId).single();
             loadingMateriElement.style.display = 'none';
 
             if (error || !data) {
-                console.error('Error fetching detail materi:', error);
                 materiContentElement.innerHTML = '<p class="text-red-500">Gagal memuat detail materi.</p>';
                 materiContentElement.classList.remove('hidden');
                 return;
             }
 
-            // 3. Isi halaman dengan data yang didapat
             materiJudul.textContent = data.judul;
-            // Menggunakan innerHTML agar tag seperti <p> dan <ul> bisa dirender
             materiKontenLengkap.innerHTML = data.konten_lengkap;
-            // Tampilkan tombol link eksternal jika ada
             if (data.link_eksternal) {
                 materiLink.href = data.link_eksternal;
                 materiTambahanContainer.classList.remove('hidden');
             }
-
             materiContentElement.classList.remove('hidden');
         }
-
-        // Fungsi utama untuk inisialisasi halaman
-        async function initializePage() {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) {
-                window.location.href = '/login.html';
-                return;
-            }
-            const { data: profile } = await supabase.from('users').select('nama_lengkap').eq('id', user.id).single();
-            if (profile) {
-                displayNameElement.textContent = profile.nama_lengkap;
-            }
-            await fetchDetailMateri();
-        }
-
-        logoutButton.addEventListener('click', async () => {
-            await supabase.auth.signOut();
-            window.location.href = '/login.html';
-        });
-
-        document.addEventListener('DOMContentLoaded', initializePage);
+        
+        document.addEventListener('layoutReady', fetchDetailMateri);
     </script>
-    
 </body>
 </html>

@@ -3,131 +3,180 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rekap Nilai - Portal Guru</title>
-    <link rel="icon" type="image/png" href="../assets/images/favicon.ico">  
+    <title>Rekap Nilai Terstruktur - Portal Guru</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
+        /* Style untuk loader/spinner */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4f46e5;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* Custom scrollbar */
+        .table-container::-webkit-scrollbar {
+            height: 8px;
+        }
+        .table-container::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .table-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #a8b2c1;
+        }
     </style>
 </head>
-<body class="bg-gray-100">
+<body class="bg-slate-100 text-slate-800">
 
-    <div class="relative min-h-screen md:flex">
-        <!-- Sidebar -->
-        <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden" style="display: none;"></div>
-        <div id="sidebar" class="bg-white w-64 absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition duration-200 ease-in-out shadow-lg z-30">
-            <div class="flex items-center justify-center h-20 shadow-md">
-                <h1 class="text-2xl font-bold text-indigo-600">Portal Guru</h1>
-            </div>
-            <nav class="flex-1 px-4 py-4 space-y-2">
-                <a href="dashboard-guru.html" class="flex items-center px-4 py-2 text-gray-600 hover:bg-indigo-100 hover:text-indigo-600 rounded-lg transition duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
-                    Dashboard
-                </a>
-                <a href="manajemen-materi.html" class="flex items-center px-4 py-2 text-gray-600 hover:bg-indigo-100 hover:text-indigo-600 rounded-lg transition duration-200">
-                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
-                    Manajemen Materi
-                </a>
-                <a href="manajemen-latihan.html" class="flex items-center px-4 py-2 text-gray-600 hover:bg-indigo-100 hover:text-indigo-600 rounded-lg transition duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
-                    Manajemen Latihan
-                </a>
-                 <a href="rekap-nilai.html" class="flex items-center px-4 py-2 text-white bg-indigo-600 rounded-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-                    Rekap Nilai
-                </a>
-                <a href="daftar-siswa.html" class="flex items-center px-4 py-2 text-gray-600 hover:bg-indigo-100 hover:text-indigo-600 rounded-lg transition duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                    Daftar Siswa
-                </a>
-            </nav>
-        </div>
-
-        <!-- Main Content -->
-        <div class="flex-1 overflow-y-auto">
-            <main class="container overflow-y-auto">
-                <!-- Header -->
-                <div class="flex items-center justify-between h-20 bg-white shadow-md px-6 sticky top-0 z-10">
-                    <button id="hamburger-btn" class="md:hidden text-gray-500 focus:outline-none">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-                    </button>
-                    <div class="text-2xl font-semibold text-gray-800 hidden md:block">Rekap Nilai</div>
-                    <div class="flex items-center space-x-4">
-                        <span class="text-gray-600 hidden sm:block">Selamat datang, <span id="display-name" class="font-semibold">Memuat...</span></span>
-                        <button id="logout-button" class="text-sm text-red-500 hover:text-red-700 font-semibold">Logout</button>
-                    </div>
+        
+            <!-- Area Konten -->
+            <main class="flex-1 overflow-y-auto p-6">
+                <!-- Dasbor Statistik -->
+                <div id="stats-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <!-- Cards will be injected by JS -->
                 </div>
-            
-                <!-- Content Area -->
-                <div class="p-6">
-                    <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-                        <div class="flex items-center gap-2 w-full sm:w-auto">
-                            <label for="filter-kelas" class="text-sm font-medium text-gray-700">Filter Kelas:</label>
-                            <select id="filter-kelas" class="block w-full sm:w-48 py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+
+                <!-- Kontrol & Aksi -->
+                <div class="mb-6 p-4 bg-white rounded-lg shadow">
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="w-full sm:max-w-xs">
+                            <input type="text" id="search-input" placeholder="Cari nama siswa atau tugas..." class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                        </div>
+                        <div class="flex items-center gap-4 w-full sm:w-auto">
+                            <select id="filter-kelas" class="w-full sm:w-48 px-4 py-2 border border-slate-300 bg-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
                                 <option value="semua">Semua Kelas</option>
                             </select>
-                        </div>
-                        <div class="flex gap-2 w-full sm:w-auto justify-end">
-                            <button id="show-manual-input-btn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-semibold shadow text-sm">
-                                Input Nilai Manual
+                            <button id="show-manual-input-btn" class="w-full sm:w-auto px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-semibold shadow transition whitespace-nowrap">
+                                Input Manual
                             </button>
-                            <button id="export-excel-btn" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold shadow text-sm">
-                                Export ke Excel
+                            <button id="export-excel-btn" class="w-full sm:w-auto px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold shadow transition whitespace-nowrap">
+                                Export Excel
                             </button>
                         </div>
                     </div>
+                </div>
 
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <h3 class="font-bold text-xl mb-4 text-gray-800">Daftar Pengumpulan Tugas</h3>
-                        <div id="submission-list" class="space-y-4">
-                            <p id="loading-submissions" class="text-gray-500">Memuat data...</p>
-                        </div>
+                <!-- Tabel Nilai -->
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div id="table-container" class="overflow-x-auto table-container">
+                        <table class="w-full min-w-[800px] text-sm text-left text-slate-500">
+                            <thead class="text-xs text-slate-700 uppercase bg-slate-50">
+                                <tr>
+                                    <th scope="col" class="p-4">Nama Siswa</th>
+                                    <th scope="col" class="p-4">Kelas</th>
+                                    <th scope="col" class="p-4">Judul Tugas</th>
+                                    <th scope="col" class="p-4">Tgl Kumpul</th>
+                                    <th scope="col" class="p-4 text-center">Status</th>
+                                    <th scope="col" class="p-4 text-center">Nilai</th>
+                                    <th scope="col" class="p-4 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="submission-table-body">
+                                <!-- Rows will be injected by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="table-loader" class="flex justify-center items-center p-10">
+                        <div class="loader"></div>
+                    </div>
+                    <div id="empty-state" class="text-center p-10 hidden">
+                        <svg class="mx-auto h-12 w-12 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        <h3 class="mt-2 text-sm font-medium text-slate-900">Tidak Ada Data</h3>
+                        <p class="mt-1 text-sm text-slate-500">Belum ada data pengumpulan tugas yang sesuai dengan filter Anda.</p>
                     </div>
                 </div>
             </main>
         </div>
     </div>
-
-    <!-- Modal untuk Input Nilai Manual -->
-    <div id="manual-input-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-40" style="display: none;">
-        <div class="relative top-20 mx-auto p-5 border w-full max-w-lg shadow-lg rounded-md bg-white">
+    
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 space-y-2"></div>
+    
+    <!-- Modals -->
+    <!-- Modal: Input/Edit Nilai -->
+    <div id="grade-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 hidden">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-lg mx-4">
             <div class="flex justify-between items-center pb-3 border-b">
-                <p class="text-2xl font-bold text-gray-800">Input Nilai Manual</p>
-                <button id="close-modal-btn" class="cursor-pointer z-50">
-                    <svg class="w-6 h-6 text-gray-500 hover:text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
+                <h3 class="text-xl font-bold text-slate-800" id="grade-modal-title">Beri Nilai</h3>
+                <button class="close-modal-btn">&times;</button>
+            </div>
+            <div class="mt-5 space-y-4">
+                <p><strong>Siswa:</strong> <span id="modal-student-name"></span></p>
+                <p><strong>Tugas:</strong> <span id="modal-exercise-title"></span></p>
+                <div id="modal-submission-link-container"></div>
+                <div>
+                    <label for="modal-nilai" class="block text-sm font-medium text-slate-700">Nilai (0-100)</label>
+                    <input type="number" id="modal-nilai" class="mt-1 w-full border-slate-300 rounded-md shadow-sm" min="0" max="100">
+                </div>
+                <div>
+                    <label for="modal-feedback" class="block text-sm font-medium text-slate-700">Feedback (Opsional)</label>
+                    <textarea id="modal-feedback" rows="3" class="mt-1 w-full border-slate-300 rounded-md shadow-sm"></textarea>
+                </div>
+            </div>
+            <div class="mt-6 flex justify-end gap-3">
+                <button class="close-modal-btn px-4 py-2 bg-slate-200 rounded-lg hover:bg-slate-300">Batal</button>
+                <button id="save-grade-btn" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Konfirmasi Hapus -->
+    <div id="confirm-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4 text-center">
+            <h3 class="text-lg font-bold">Konfirmasi Penghapusan</h3>
+            <p class="my-4 text-slate-600">Apakah Anda yakin ingin menghapus data ini secara permanen? Aksi ini tidak dapat dibatalkan.</p>
+            <div class="flex justify-center gap-4">
+                <button id="confirm-cancel-btn" class="px-6 py-2 bg-slate-200 rounded-lg hover:bg-slate-300">Batal</button>
+                <button id="confirm-delete-btn" class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Hapus</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal: Input Nilai Manual (Existing) -->
+    <div id="manual-input-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 hidden">
+       <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-lg mx-4">
+            <div class="flex justify-between items-center pb-3 border-b">
+                <h3 class="text-xl font-bold text-gray-800">Input Nilai Manual</h3>
+                <button class="close-manual-modal-btn">&times;</button>
             </div>
             <div class="mt-5">
-                <form id="manual-grade-form">
-                    <div class="space-y-4">
-                        <div>
-                            <label for="select-student" class="block text-sm font-medium text-gray-700">Pilih Siswa</label>
-                            <select id="select-student" name="student" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
-                                <option value="">Memuat daftar siswa...</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="select-exercise" class="block text-sm font-medium text-gray-700">Pilih Latihan/Tugas</label>
-                            <select id="select-exercise" name="exercise" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
-                                <option value="">Memuat daftar latihan...</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="manual-nilai" class="block text-sm font-medium text-gray-700">Nilai</label>
-                            <input type="number" name="nilai" id="manual-nilai" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" placeholder="Masukkan nilai (0-100)" required>
-                        </div>
-                        <div>
-                            <label for="manual-feedback" class="block text-sm font-medium text-gray-700">Feedback (Opsional)</label>
-                            <textarea id="manual-feedback" name="feedback" rows="3" class="mt-1 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border border-gray-300 rounded-md" placeholder="Tulis feedback untuk siswa..."></textarea>
-                        </div>
+                <form id="manual-grade-form" class="space-y-4">
+                    <div>
+                        <label for="select-student" class="block text-sm font-medium text-gray-700">Pilih Siswa</label>
+                        <select id="select-student" required class="mt-1 w-full border-slate-300 rounded-md shadow-sm">
+                            <option value="">Memuat...</option>
+                        </select>
                     </div>
-                    <div class="mt-6 flex justify-end">
-                        <button type="submit" class="px-6 py-2.5 bg-indigo-600 text-white font-medium text-sm leading-tight rounded-md shadow-md hover:bg-indigo-700 hover:shadow-lg focus:bg-indigo-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-indigo-800 active:shadow-lg transition duration-150 ease-in-out">
-                            Simpan Nilai
-                        </button>
+                    <div>
+                        <label for="select-exercise" class="block text-sm font-medium text-gray-700">Pilih Latihan/Tugas</label>
+                        <select id="select-exercise" required class="mt-1 w-full border-slate-300 rounded-md shadow-sm">
+                             <option value="">Memuat...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="manual-nilai" class="block text-sm font-medium text-gray-700">Nilai</label>
+                        <input type="number" id="manual-nilai" required class="mt-1 w-full border-slate-300 rounded-md shadow-sm" placeholder="0-100">
+                    </div>
+                    <div>
+                        <label for="manual-feedback" class="block text-sm font-medium text-gray-700">Feedback (Opsional)</label>
+                        <textarea id="manual-feedback" rows="3" class="mt-1 w-full border-slate-300 rounded-md shadow-sm"></textarea>
+                    </div>
+                    <div class="mt-6 flex justify-end gap-3">
+                        <button type="button" class="close-manual-modal-btn px-6 py-2 bg-slate-200 rounded-lg hover:bg-slate-300">Batal</button>
+                        <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Simpan Nilai</button>
                     </div>
                 </form>
             </div>
@@ -135,286 +184,364 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-
+    <script type="module" src="../js/layout.js"></script>
     <script type="module">
         import { supabase } from '../js/supabase-client.js';
-
-        const displayNameElement = document.getElementById('display-name');
-        const logoutButton = document.getElementById('logout-button');
-        const submissionListContainer = document.getElementById('submission-list');
-        const loadingSubmissionsElement = document.getElementById('loading-submissions');
-        const exportExcelBtn = document.getElementById('export-excel-btn');
-        const hamburgerBtn = document.getElementById('hamburger-btn');
-        const sidebar = document.getElementById('sidebar');
-        const sidebarOverlay = document.getElementById('sidebar-overlay');
         
-        const showManualInputBtn = document.getElementById('show-manual-input-btn');
-        const manualInputModal = document.getElementById('manual-input-modal');
-        const closeModalBtn = document.getElementById('close-modal-btn');
-        const manualGradeForm = document.getElementById('manual-grade-form');
-        const selectStudent = document.getElementById('select-student');
-        const selectExercise = document.getElementById('select-exercise');
+        // --- State Aplikasi ---
+        let allSubmissionsData = [];
+        let currentSubmissionId = null;
 
-        const filterKelasSelect = document.getElementById('filter-kelas');
-        let allSubmissionsData = []; 
+        // --- Elemen DOM ---
+        const DOMElements = {
+            displayName: document.getElementById('display-name'),
+            logoutButton: document.getElementById('logout-button'),
+            sidebar: document.getElementById('sidebar'),
+            sidebarOverlay: document.getElementById('sidebar-overlay'),
+            hamburgerBtn: document.getElementById('hamburger-btn'),
+            statsContainer: document.getElementById('stats-container'),
+            searchInput: document.getElementById('search-input'),
+            filterKelas: document.getElementById('filter-kelas'),
+            tableBody: document.getElementById('submission-table-body'),
+            tableLoader: document.getElementById('table-loader'),
+            emptyState: document.getElementById('empty-state'),
+            exportBtn: document.getElementById('export-excel-btn'),
+            toastContainer: document.getElementById('toast-container'),
+            // Grade Modal
+            gradeModal: document.getElementById('grade-modal'),
+            gradeModalTitle: document.getElementById('grade-modal-title'),
+            modalStudentName: document.getElementById('modal-student-name'),
+            modalExerciseTitle: document.getElementById('modal-exercise-title'),
+            modalSubmissionLink: document.getElementById('modal-submission-link-container'),
+            modalNilai: document.getElementById('modal-nilai'),
+            modalFeedback: document.getElementById('modal-feedback'),
+            saveGradeBtn: document.getElementById('save-grade-btn'),
+            // Confirm Modal
+            confirmModal: document.getElementById('confirm-modal'),
+            confirmDeleteBtn: document.getElementById('confirm-delete-btn'),
+            confirmCancelBtn: document.getElementById('confirm-cancel-btn'),
+            // Manual Input Modal
+            showManualInputBtn: document.getElementById('show-manual-input-btn'),
+            manualInputModal: document.getElementById('manual-input-modal'),
+            manualGradeForm: document.getElementById('manual-grade-form'),
+            selectStudent: document.getElementById('select-student'),
+            selectExercise: document.getElementById('select-exercise'),
+        };
 
-        hamburgerBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('-translate-x-full');
-            sidebarOverlay.style.display = sidebar.classList.contains('-translate-x-full') ? 'none' : 'block';
-        });
-        sidebarOverlay.addEventListener('click', () => {
-            sidebar.classList.add('-translate-x-full');
-            sidebarOverlay.style.display = 'none';
-        });
+        // --- Fungsi Utilitas ---
+        const showToast = (message, type = 'success') => {
+            const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
+            const toast = document.createElement('div');
+            toast.className = `p-4 rounded-lg text-white shadow-lg transform transition-all duration-300 ${bgColor}`;
+            toast.textContent = message;
+            DOMElements.toastContainer.appendChild(toast);
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        };
 
-        function renderSubmissions(submissionsToRender) {
-            submissionListContainer.innerHTML = ''; 
+        // --- Render Functions ---
+        const renderStats = (data) => {
+            const totalSubmissions = data.length;
+            const needsGrading = data.filter(item => item.nilai === null).length;
+            const gradedSubmissions = data.filter(item => item.nilai !== null);
+            const averageScore = gradedSubmissions.length > 0
+                ? (gradedSubmissions.reduce((acc, item) => acc + item.nilai, 0) / gradedSubmissions.length).toFixed(1)
+                : 'N/A';
 
-            if (submissionsToRender.length === 0) {
-                submissionListContainer.innerHTML = '<p class="text-gray-500">Tidak ada data tugas yang ditemukan untuk filter ini.</p>';
+            DOMElements.statsContainer.innerHTML = `
+                <div class="bg-white p-5 rounded-lg shadow"><p class="text-sm text-slate-500">Total Pengumpulan</p><p class="text-2xl font-bold">${totalSubmissions}</p></div>
+                <div class="bg-white p-5 rounded-lg shadow"><p class="text-sm text-slate-500">Perlu Dinilai</p><p class="text-2xl font-bold text-orange-500">${needsGrading}</p></div>
+                <div class="bg-white p-5 rounded-lg shadow"><p class="text-sm text-slate-500">Rata-rata Nilai</p><p class="text-2xl font-bold text-green-500">${averageScore}</p></div>
+                <div class="bg-white p-5 rounded-lg shadow"><p class="text-sm text-slate-500">Jumlah Kelas</p><p class="text-2xl font-bold">${[...new Set(data.map(i => i.kelas_siswa))].length}</p></div>
+            `;
+        };
+
+        const renderTable = (data) => {
+            DOMElements.tableLoader.classList.add('hidden');
+            if (data.length === 0) {
+                DOMElements.emptyState.classList.remove('hidden');
+                DOMElements.tableBody.innerHTML = '';
                 return;
             }
+            DOMElements.emptyState.classList.add('hidden');
 
-            submissionsToRender.forEach(item => {
-                const submissionCard = document.createElement('div');
-                submissionCard.className = 'border rounded-lg p-4 space-y-3';
-                const tglKumpul = new Date(item.tgl_kumpul).toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' });
-                
-                let penilaianHtml = '';
-                if (item.nilai !== null) {
-                    penilaianHtml = `<p class="text-lg font-bold text-green-600">Nilai: ${item.nilai}</p>`;
-                } else {
-                    penilaianHtml = `
-                        <div class="flex items-center gap-2">
-                            <input type="number" id="nilai-${item.hasil_id}" class="w-24 border-gray-300 rounded-md shadow-sm" placeholder="Nilai...">
-                            <button data-id="${item.hasil_id}" class="beri-nilai-btn px-3 py-1.5 bg-indigo-600 text-white text-sm font-semibold rounded-md hover:bg-indigo-700">Beri Nilai</button>
-                        </div>`;
-                }
-
-                // --- PERUBAHAN DI SINI: Menambahkan Tombol Hapus ---
-                submissionCard.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h4 class="font-bold text-lg text-gray-800">${item.judul_latihan}</h4>
-                            <p class="text-sm text-gray-600">Oleh: ${item.nama_siswa} (Kelas: ${item.kelas_siswa || 'N/A'})</p>
-                            <p class="text-xs text-gray-500">Dikumpulkan: ${tglKumpul}</p>
+            DOMElements.tableBody.innerHTML = data.map(item => `
+                <tr class="bg-white border-b hover:bg-slate-50">
+                    <td class="p-4 font-medium text-slate-900">${item.nama_siswa}</td>
+                    <td class="p-4">${item.kelas_siswa || 'N/A'}</td>
+                    <td class="p-4">${item.judul_latihan}</td>
+                    <td class="p-4">${new Date(item.tgl_kumpul).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}</td>
+                    <td class="p-4 text-center">
+                        ${item.nilai !== null
+                            ? '<span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Sudah Dinilai</span>'
+                            : '<span class="px-2 py-1 text-xs font-semibold text-orange-800 bg-orange-100 rounded-full">Perlu Dinilai</span>'
+                        }
+                    </td>
+                    <td class="p-4 text-center font-bold text-lg ${item.nilai !== null ? 'text-indigo-600' : 'text-slate-400'}">${item.nilai ?? '-'}</td>
+                    <td class="p-4 text-center">
+                        <div class="flex justify-center items-center gap-2">
+                           <button class="grade-btn p-2 text-slate-500 hover:text-indigo-600" data-id="${item.hasil_id}" title="Beri/Edit Nilai">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg>
+                           </button>
+                           <button class="delete-btn p-2 text-slate-500 hover:text-red-600" data-id="${item.hasil_id}" title="Hapus">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+                           </button>
                         </div>
-                        <div class="text-right">${penilaianHtml}</div>
-                    </div>
-                    ${item.submission_content ? `<div class="pt-3 border-t"><p class="text-sm text-gray-500 mb-1">Jawaban Siswa:</p><a href="${item.submission_content}" target="_blank" class="text-blue-600 hover:underline break-all">${item.submission_content}</a></div>` : ''}
-                    <div class="pt-3 border-t">
-                        <label for="feedback-${item.hasil_id}" class="text-sm text-gray-500 mb-1 block">Feedback Guru:</label>
-                        <textarea id="feedback-${item.hasil_id}" rows="2" class="w-full border-gray-300 rounded-md shadow-sm">${item.feedback || ''}</textarea>
-                        <div class="mt-2 flex justify-end items-center gap-2">
-                             <button data-id="${item.hasil_id}" class="simpan-feedback-btn px-3 py-1.5 bg-gray-600 text-white text-sm font-semibold rounded-md hover:bg-gray-700">Simpan Feedback</button>
-                             <button data-id="${item.hasil_id}" class="hapus-tugas-btn px-3 py-1.5 bg-red-600 text-white text-sm font-semibold rounded-md hover:bg-red-700 flex items-center gap-1">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                Hapus
-                             </button>
-                        </div>
-                    </div>`;
-                submissionListContainer.appendChild(submissionCard);
-            });
-            
-            attachActionListeners();
-        }
-
-        function populateClassFilter() {
+                    </td>
+                </tr>
+            `).join('');
+            attachTableActionListeners();
+        };
+        
+        const populateClassFilter = () => {
             const classes = [...new Set(allSubmissionsData.map(item => item.kelas_siswa).filter(Boolean))];
-            filterKelasSelect.innerHTML = '<option value="semua">Semua Kelas</option>';
+            DOMElements.filterKelas.innerHTML = '<option value="semua">Semua Kelas</option>';
             classes.sort().forEach(className => {
                 const option = document.createElement('option');
                 option.value = className;
                 option.textContent = className;
-                filterKelasSelect.appendChild(option);
+                DOMElements.filterKelas.appendChild(option);
             });
-        }
-        
-        async function fetchSubmissions() {
-            loadingSubmissionsElement.style.display = 'block';
-            submissionListContainer.innerHTML = '';
-            submissionListContainer.appendChild(loadingSubmissionsElement);
+        };
 
+        const applyFiltersAndRender = () => {
+            const searchTerm = DOMElements.searchInput.value.toLowerCase();
+            const selectedClass = DOMElements.filterKelas.value;
+            
+            const filteredData = allSubmissionsData.filter(item => {
+                const matchesSearch = item.nama_siswa.toLowerCase().includes(searchTerm) || item.judul_latihan.toLowerCase().includes(searchTerm);
+                const matchesClass = selectedClass === 'semua' || item.kelas_siswa === selectedClass;
+                return matchesSearch && matchesClass;
+            });
+            renderTable(filteredData);
+        };
+
+        // --- Data Fetching & Handling ---
+        const fetchSubmissions = async () => {
+            DOMElements.tableLoader.classList.remove('hidden');
+            DOMElements.emptyState.classList.add('hidden');
+            DOMElements.tableBody.innerHTML = '';
+            
             const { data, error } = await supabase.rpc('get_rekap_nilai');
-            loadingSubmissionsElement.style.display = 'none';
 
             if (error) {
                 console.error('Error fetching submissions:', error);
-                submissionListContainer.innerHTML = '<p class="text-red-500">Gagal memuat data.</p>';
+                showToast('Gagal memuat data.', 'error');
+                DOMElements.tableLoader.classList.add('hidden');
+                DOMElements.emptyState.classList.remove('hidden');
                 return;
             }
 
-            allSubmissionsData = data; 
-            renderSubmissions(allSubmissionsData); 
-            populateClassFilter(); 
-        }
+            // Mengurutkan data berdasarkan kelas, kemudian nama siswa secara abjad
+            data.sort((a, b) => {
+                const kelasA = a.kelas_siswa || '';
+                const kelasB = b.kelas_siswa || '';
+                const classComparison = kelasA.localeCompare(kelasB);
+                
+                if (classComparison !== 0) {
+                    return classComparison; // Urutkan berdasarkan kelas
+                }
+                
+                // Jika kelasnya sama, urutkan berdasarkan nama siswa
+                const namaA = a.nama_siswa || '';
+                const namaB = b.nama_siswa || '';
+                return namaA.localeCompare(namaB);
+            });
 
-        filterKelasSelect.addEventListener('change', () => {
-            const selectedClass = filterKelasSelect.value;
-            if (selectedClass === 'semua') {
-                renderSubmissions(allSubmissionsData);
-            } else {
-                const filteredData = allSubmissionsData.filter(item => item.kelas_siswa === selectedClass);
-                renderSubmissions(filteredData);
+            allSubmissionsData = data;
+            renderStats(allSubmissionsData);
+            populateClassFilter();
+            applyFiltersAndRender();
+        };
+
+        const handleSaveGrade = async () => {
+            const nilai = parseInt(DOMElements.modalNilai.value);
+            const feedback = DOMElements.modalFeedback.value;
+            if (isNaN(nilai) || nilai < 0 || nilai > 100) {
+                return showToast('Nilai harus antara 0 dan 100.', 'error');
             }
-        });
+            
+            const { error } = await supabase
+                .from('hasil_latihan')
+                .update({ nilai, feedback })
+                .eq('id', currentSubmissionId);
 
-        // --- PERUBAHAN DI SINI: Menambahkan listener untuk tombol Hapus ---
-        function attachActionListeners() {
-            document.querySelectorAll('.beri-nilai-btn').forEach(button => {
-                button.addEventListener('click', async (e) => {
-                    const submissionId = e.target.dataset.id;
-                    const nilaiInput = document.getElementById(`nilai-${submissionId}`);
-                    const nilai = parseInt(nilaiInput.value);
-                    if (isNaN(nilai)) { return alert('Harap masukkan nilai yang valid.'); }
-                    
-                    const { error } = await supabase.from('hasil_latihan').update({ nilai: nilai }).eq('id', submissionId);
-                    if (error) alert('Gagal memberi nilai.');
-                    else {
-                        alert('Nilai berhasil disimpan!');
-                        fetchSubmissions();
-                    }
-                });
-            });
+            if (error) {
+                showToast('Gagal menyimpan nilai.', 'error');
+            } else {
+                showToast('Nilai berhasil disimpan!');
+                DOMElements.gradeModal.classList.add('hidden');
+                fetchSubmissions(); // Refresh data
+            }
+        };
 
-            document.querySelectorAll('.simpan-feedback-btn').forEach(button => {
-                button.addEventListener('click', async (e) => {
-                    const submissionId = e.target.dataset.id;
-                    const feedbackText = document.getElementById(`feedback-${submissionId}`).value;
+        const handleDeleteSubmission = async () => {
+            const { error } = await supabase
+                .from('hasil_latihan')
+                .delete()
+                .eq('id', currentSubmissionId);
 
-                    const { error } = await supabase.from('hasil_latihan').update({ feedback: feedbackText }).eq('id', submissionId);
-                    if (error) alert('Gagal menyimpan feedback.');
-                    else alert('Feedback berhasil disimpan!');
-                });
-            });
+            DOMElements.confirmModal.classList.add('hidden');
+            if (error) {
+                showToast('Gagal menghapus data.', 'error');
+            } else {
+                showToast('Data berhasil dihapus.');
+                fetchSubmissions(); // Refresh data
+            }
+        };
 
-            // Listener baru untuk tombol Hapus
-            document.querySelectorAll('.hapus-tugas-btn').forEach(button => {
-                button.addEventListener('click', async (e) => {
-                    // Menggunakan .closest() untuk memastikan kita mendapatkan tombolnya, bahkan jika ikon SVG diklik
-                    const submissionId = e.target.closest('button').dataset.id;
-                    
-                    const isConfirmed = confirm('Apakah Anda yakin ingin menghapus data tugas ini secara permanen? Aksi ini tidak dapat dibatalkan.');
-                    
-                    if (isConfirmed) {
-                        const { error } = await supabase
-                            .from('hasil_latihan')
-                            .delete()
-                            .eq('id', submissionId);
-                        
-                        if (error) {
-                            alert(`Gagal menghapus tugas. Pastikan Anda memiliki izin. Error: ${error.message}`);
-                            console.error('Error deleting submission:', error);
+        // --- Event Listeners ---
+        const attachTableActionListeners = () => {
+            document.querySelectorAll('.grade-btn').forEach(btn => {
+                btn.onclick = (e) => {
+                    currentSubmissionId = e.currentTarget.dataset.id;
+                    const submission = allSubmissionsData.find(s => s.hasil_id == currentSubmissionId);
+                    if (submission) {
+                        DOMElements.gradeModalTitle.textContent = submission.nilai === null ? 'Beri Nilai' : 'Edit Nilai';
+                        DOMElements.modalStudentName.textContent = submission.nama_siswa;
+                        DOMElements.modalExerciseTitle.textContent = submission.judul_latihan;
+                        if(submission.submission_content) {
+                            DOMElements.modalSubmissionLink.innerHTML = `<a href="${submission.submission_content}" target="_blank" class="text-blue-600 hover:underline break-all">Lihat Jawaban Siswa</a>`;
                         } else {
-                            alert('Data tugas berhasil dihapus.');
-                            // Ambil ulang data dari server untuk me-refresh tampilan
-                            fetchSubmissions(); 
+                             DOMElements.modalSubmissionLink.innerHTML = '';
                         }
+                        DOMElements.modalNilai.value = submission.nilai ?? '';
+                        DOMElements.modalFeedback.value = submission.feedback ?? '';
+                        DOMElements.gradeModal.classList.remove('hidden');
                     }
-                });
+                };
             });
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.onclick = (e) => {
+                    currentSubmissionId = e.currentTarget.dataset.id;
+                    DOMElements.confirmModal.classList.remove('hidden');
+                };
+            });
+        };
+
+        const setupEventListeners = () => {
+            DOMElements.hamburgerBtn.addEventListener('click', () => {
+                DOMElements.sidebar.classList.toggle('-translate-x-full');
+                DOMElements.sidebarOverlay.classList.toggle('hidden');
+            });
+            DOMElements.sidebarOverlay.addEventListener('click', () => {
+                DOMElements.sidebar.classList.add('-translate-x-full');
+                DOMElements.sidebarOverlay.classList.add('hidden');
+            });
+            DOMElements.logoutButton.addEventListener('click', async () => {
+                await supabase.auth.signOut();
+                window.location.href = '/login.html'; // Ganti dengan halaman login Anda
+            });
+            
+            DOMElements.searchInput.addEventListener('input', applyFiltersAndRender);
+            DOMElements.filterKelas.addEventListener('change', applyFiltersAndRender);
+
+            // Grade Modal Listeners
+            DOMElements.saveGradeBtn.addEventListener('click', handleSaveGrade);
+            document.querySelectorAll('.close-modal-btn').forEach(btn => btn.onclick = () => DOMElements.gradeModal.classList.add('hidden'));
+
+            // Confirm Modal Listeners
+            DOMElements.confirmDeleteBtn.addEventListener('click', handleDeleteSubmission);
+            DOMElements.confirmCancelBtn.addEventListener('click', () => DOMElements.confirmModal.classList.add('hidden'));
+
+             // Manual Input Modal Listeners
+            DOMElements.showManualInputBtn.addEventListener('click', () => {
+                DOMElements.manualInputModal.classList.remove('hidden');
+                populateStudentsDropdown();
+                populateExercisesDropdown();
+            });
+            document.querySelectorAll('.close-manual-modal-btn').forEach(btn => {
+                btn.onclick = () => {
+                    DOMElements.manualInputModal.classList.add('hidden');
+                    DOMElements.manualGradeForm.reset();
+                };
+            });
+
+            DOMElements.manualGradeForm.addEventListener('submit', handleManualGradeSubmit);
+            DOMElements.exportBtn.addEventListener('click', exportToExcel);
+        };
+        
+        // --- Manual Input & Export ---
+         const populateStudentsDropdown = async () => { 
+            const { data, error } = await supabase.from('users').select('id, nama_lengkap').eq('role', 'siswa').order('nama_lengkap', { ascending: true });
+            if (error) { DOMElements.selectStudent.innerHTML = '<option value="">Gagal</option>'; return; }
+            DOMElements.selectStudent.innerHTML = '<option value="">-- Pilih Siswa --</option>';
+            data.forEach(s => DOMElements.selectStudent.innerHTML += `<option value="${s.id}">${s.nama_lengkap}</option>`);
         }
+        const populateExercisesDropdown = async () => {
+             const { data, error } = await supabase.from('latihan').select('id, judul').order('created_at', { ascending: false });
+            if (error) { DOMElements.selectExercise.innerHTML = '<option value="">Gagal</option>'; return; }
+            DOMElements.selectExercise.innerHTML = '<option value="">-- Pilih Latihan --</option>';
+            data.forEach(e => DOMElements.selectExercise.innerHTML += `<option value="${e.id}">${e.judul}</option>`);
+         }
 
-        showManualInputBtn.addEventListener('click', () => {
-            manualInputModal.style.display = 'block';
-            populateStudentsDropdown();
-            populateExercisesDropdown();
-        });
-        closeModalBtn.addEventListener('click', () => { manualInputModal.style.display = 'none'; });
-        window.addEventListener('click', (event) => {
-            if (event.target == manualInputModal) manualInputModal.style.display = 'none';
-        });
-
-        manualGradeForm.addEventListener('submit', async (e) => {
+        const handleManualGradeSubmit = async (e) => {
             e.preventDefault();
-            const studentId = selectStudent.value;
-            const exerciseId = parseInt(selectExercise.value);
-            const nilai = parseInt(document.getElementById('manual-nilai').value);
-            const feedback = document.getElementById('manual-feedback').value;
-
-            if (!studentId || isNaN(exerciseId)) return alert('Harap pilih siswa dan latihan.');
-            if (isNaN(nilai) || nilai < 0 || nilai > 100) return alert('Nilai harus antara 0-100.');
+            const formData = new FormData(e.target);
+            const nilai = parseInt(formData.get('nilai'));
+             if (isNaN(nilai) || nilai < 0 || nilai > 100) return showToast('Nilai harus 0-100.', 'error');
 
             const { error } = await supabase.from('hasil_latihan').insert([{
-                user_id: studentId,
-                latihan_id: exerciseId,
+                user_id: formData.get('student'),
+                latihan_id: parseInt(formData.get('exercise')),
                 nilai: nilai,
-                feedback: feedback,
-                created_at: new Date().toISOString(),
+                feedback: formData.get('feedback'),
                 submission_content: 'Dinilai manual oleh guru'
             }]);
 
             if (error) {
-                alert(`Gagal menyimpan nilai. Error: ${error.message}`);
+                showToast(`Gagal menyimpan: ${error.message}`, 'error');
             } else {
-                alert('Nilai berhasil disimpan!');
-                manualGradeForm.reset();
-                manualInputModal.style.display = 'none';
+                showToast('Nilai manual berhasil disimpan!');
+                e.target.reset();
+                DOMElements.manualInputModal.classList.add('hidden');
                 fetchSubmissions();
             }
-        });
-        
-        async function populateStudentsDropdown() { 
-            const { data, error } = await supabase.from('users').select('id, nama_lengkap').eq('role', 'siswa').order('nama_lengkap', { ascending: true });
-            if (error) { selectStudent.innerHTML = '<option value="">Gagal memuat</option>'; return; }
-            selectStudent.innerHTML = '<option value="">-- Pilih Siswa --</option>';
-            data.forEach(student => {
-                const option = document.createElement('option');
-                option.value = student.id;
-                option.textContent = student.nama_lengkap;
-                selectStudent.appendChild(option);
-            });
-        }
-        async function populateExercisesDropdown() {
-             const { data, error } = await supabase.from('latihan').select('id, judul').order('created_at', { ascending: false });
-            if (error) { selectExercise.innerHTML = '<option value="">Gagal memuat</option>'; return; }
-            selectExercise.innerHTML = '<option value="">-- Pilih Latihan/Tugas --</option>';
-            data.forEach(exercise => {
-                const option = document.createElement('option');
-                option.value = exercise.id;
-                option.textContent = exercise.judul;
-                selectExercise.appendChild(option);
-            });
-         }
-        
-        function exportToExcel() {
+        };
+
+        const exportToExcel = () => {
+            // Apply current filters before exporting
+            const searchTerm = DOMElements.searchInput.value.toLowerCase();
+            const selectedClass = DOMElements.filterKelas.value;
             const dataToExport = allSubmissionsData.filter(item => {
-                const selectedClass = filterKelasSelect.value;
-                return selectedClass === 'semua' || item.kelas_siswa === selectedClass;
+                const matchesSearch = item.nama_siswa.toLowerCase().includes(searchTerm) || item.judul_latihan.toLowerCase().includes(searchTerm);
+                const matchesClass = selectedClass === 'semua' || item.kelas_siswa === selectedClass;
+                return matchesSearch && matchesClass;
             }).map(item => ({
                 "Nama Siswa": item.nama_siswa,
-                "Kelas Siswa": item.kelas_siswa, 
+                "Kelas": item.kelas_siswa, 
                 "Judul Latihan": item.judul_latihan,
-                "Tanggal Kumpul": new Date(item.tgl_kumpul).toLocaleString('id-ID'),
+                "Tgl Kumpul": new Date(item.tgl_kumpul).toLocaleString('id-ID'),
                 "Nilai": item.nilai,
                 "Link Jawaban": item.submission_content,
                 "Feedback Guru": item.feedback
             }));
             
-            if (dataToExport.length === 0) return alert("Tidak ada data untuk diexport.");
+            if (dataToExport.length === 0) return showToast("Tidak ada data untuk diekspor.", 'error');
             
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Rekap Nilai");
-            XLSX.writeFile(workbook, "Rekap_Nilai_Siswa.xlsx");
-        }
-        exportExcelBtn.addEventListener('click', exportToExcel);
+            XLSX.writeFile(workbook, `Rekap_Nilai_${new Date().toISOString().slice(0,10)}.xlsx`);
+        };
 
-        async function initializePage() {
+
+        // --- Inisialisasi ---
+        const initializePage = async () => {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) { window.location.href = '/login.html'; return; }
+            
             const { data: profile } = await supabase.from('users').select('nama_lengkap').eq('id', user.id).single();
-            if (profile) displayNameElement.textContent = profile.nama_lengkap;
+            if (profile) DOMElements.displayName.textContent = profile.nama_lengkap;
+            
+            setupEventListeners();
             await fetchSubmissions();
-        }
+        };
 
-        logoutButton.addEventListener('click', async () => {
-            await supabase.auth.signOut();
-            window.location.href = '/login.html';
-        });
-
-        document.addEventListener('DOMContentLoaded', initializePage);
+        document.addEventListener('layoutReady', initializePage);
     </script>
 </body>
 </html>
+
 
