@@ -45,6 +45,31 @@
         const materiTambahanContainer = document.getElementById('materi-tambahan-container');
         const materiLink = document.getElementById('materi-link');
 
+        // --- PERUBAHAN DI SINI: Fungsi untuk merekam aktivitas siswa ---
+        async function rekamAktivitasSiswa(materiId) {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user || !materiId) return;
+
+            // Cek dulu apakah sudah pernah direkam untuk menghindari duplikat
+            const { data: existingLog, error: checkError } = await supabase
+                .from('progress_pembelajaran')
+                .select('id')
+                .eq('user_id', user.id)
+                .eq('materi_id', materiId)
+                .maybeSingle();
+
+            // Jika belum ada log, buat entri baru
+            if (!existingLog && !checkError) {
+                const { error: insertError } = await supabase
+                    .from('progress_pembelajaran')
+                    .insert({ user_id: user.id, materi_id: materiId });
+                
+                if (insertError) {
+                    console.error("Gagal merekam aktivitas:", insertError.message);
+                }
+            }
+        }
+
         async function fetchDetailMateri() {
             const params = new URLSearchParams(window.location.search);
             const materiId = params.get('id');
@@ -52,6 +77,9 @@
                 window.location.href = 'materi-siswa.html';
                 return;
             }
+
+            // --- PERUBAHAN DI SINI: Panggil fungsi rekam aktivitas ---
+            await rekamAktivitasSiswa(materiId);
 
             const { data, error } = await supabase.from('materi').select('judul, konten_lengkap, link_eksternal').eq('id', materiId).single();
             loadingMateriElement.style.display = 'none';

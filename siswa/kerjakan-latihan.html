@@ -61,6 +61,30 @@
         let latihanData = null;
         let isFileSubmission = false;
 
+        // --- PERUBAHAN DI SINI: Fungsi untuk merekam aktivitas siswa ---
+        async function rekamAktivitasSiswa(latihanId, userId) {
+            if (!userId || !latihanId) return;
+
+            // Cek dulu apakah sudah pernah direkam
+            const { data: existingLog, error: checkError } = await supabase
+                .from('progress_pembelajaran')
+                .select('id')
+                .eq('user_id', userId)
+                .eq('latihan_id', latihanId)
+                .maybeSingle();
+
+            // Jika belum ada log, buat entri baru
+            if (!existingLog && !checkError) {
+                const { error: insertError } = await supabase
+                    .from('progress_pembelajaran')
+                    .insert({ user_id: userId, latihan_id: latihanId });
+                
+                if (insertError) {
+                    console.error("Gagal merekam aktivitas:", insertError.message);
+                }
+            }
+        }
+
         function displaySoal(soalList) {
             soalPgContainer.innerHTML = '';
             if (!soalList || soalList.length === 0) {
@@ -91,6 +115,9 @@
                 window.location.href = 'tugas-siswa.html';
                 return;
             }
+            
+            // --- PERUBAHAN DI SINI: Panggil fungsi rekam aktivitas ---
+            await rekamAktivitasSiswa(latihanId, user.id);
 
             const { data, error } = await supabase.from('latihan').select('*').eq('id', latihanId).single();
             if (error || !data) {

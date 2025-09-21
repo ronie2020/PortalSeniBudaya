@@ -4,189 +4,260 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daftar Siswa - Portal Guru</title>
-    <link rel="icon" type="image/png" href="../assets/images/favicon.ico">  
+    <link rel="icon" type="image/png" href="../assets/images/favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style> body { font-family: 'Inter', sans-serif; } </style>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4f46e5;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
-<body class="bg-gray-100">
+<body class="bg-slate-100 text-slate-800">
 
-                <!-- Content Area -->
-                <div class="p-6">
-                    <!-- PERUBAHAN DI SINI: Menambahkan Filter dan Pencarian -->
-                    <div class="mb-6 bg-white p-6 rounded-lg shadow flex flex-col md:flex-row items-center gap-6">
-                        <div class="w-full md:flex-1">
-                            <label for="search-input" class="block text-medium font-medium text-gray-700">Cari Nama Siswa</label>
-                            <input type="search" id="search-input" placeholder="Ketik nama untuk mencari..." class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                        </div>
-                        <div class="w-full md:w-1/3">
-                            <label for="kelas-filter" class="block text-sm font-medium text-gray-700">Filter Berdasarkan Kelas</label>
-                            <select id="kelas-filter" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                                <option value="">Semua Kelas</option>
-                                <!-- Opsi kelas akan diisi oleh JavaScript -->
-                            </select>
-                        </div>
-                    </div>
+    <!-- Konten utama akan di-render oleh layout.js -->
+    <!-- Diasumsikan ada <div id="app-container"> atau sejenisnya di layout -->
+    
+    <!-- Area Konten -->
+    <main class="flex-1 overflow-y-auto p-6">
+        <!-- Filter dan Pencarian -->
+        <div class="mb-6 bg-white p-6 rounded-lg shadow flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="w-full md:flex-1">
+                <label for="search-input" class="text-sm font-medium text-slate-700">Cari Nama Siswa</label>
+                <input type="search" id="search-input" placeholder="Ketik nama untuk mencari..." class="mt-1 block w-full border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div class="w-full md:w-auto">
+                <label for="kelas-filter" class="text-sm font-medium text-slate-700">Filter Kelas</label>
+                <select id="kelas-filter" class="mt-1 block w-full md:w-48 border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="">Semua Kelas</option>
+                    <!-- Opsi kelas akan diisi oleh JavaScript -->
+                </select>
+            </div>
+             <div class="w-full md:w-auto flex flex-col sm:flex-row gap-2 self-end">
+                <a href="upload-siswa.html" class="px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold shadow text-center">
+                    Upload Siswa
+                </a>
+                <a href="tambah-siswa.html" class="px-4 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-semibold shadow text-center">
+                    + Tambah Siswa
+                </a>
+            </div>
+        </div>
 
-                    <div class="flex justify-end mb-6 space-x-4">
-                        <a href="upload-siswa.html" class="px-5 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold shadow">
-                            Upload Daftar Siswa
-                        </a>
-                        <a href="tambah-siswa.html" class="px-5 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-semibold shadow">
-                            + Tambah Siswa Baru
-                        </a>
-                    </div>
+        <!-- Tabel Siswa -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-slate-500">
+                    <thead class="text-xs text-slate-700 uppercase bg-slate-50">
+                        <tr>
+                            <th scope="col" class="p-4">No</th>
+                            <th scope="col" class="p-4">Nama Lengkap</th>
+                            <th scope="col" class="p-4">Username</th>
+                            <th scope="col" class="p-4">NISN</th>
+                            <th scope="col" class="p-4">Kelas</th>
+                            <th scope="col" class="p-4">Tanggal Dibuat</th>
+                            <th scope="col" class="p-4 text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="student-list-body" class="bg-white">
+                        <!-- State awal akan ditangani JS -->
+                    </tbody>
+                </table>
+            </div>
+             <!-- Loading & Empty State Container -->
+             <div id="table-state-container"></div>
+        </div>
+    </main>
 
-                    <div class="bg-white p-6 rounded-lg shadow overflow-x-auto">
-                        <h3 class="font-bold text-xl mb-4 text-gray-800">Semua Siswa Terdaftar</h3>
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Lengkap</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NISN</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kelas</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Dibuat</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="student-list-body" class="bg-white divide-y divide-gray-200">
-                                <tr><td colspan="6" class="px-6 py-4 text-center text-gray-500"><p id="loading-students">Memuat data siswa...</p></td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </main>                
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 space-y-2"></div>
+
+    <!-- Modal Konfirmasi Hapus -->
+    <div id="confirm-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+            <h3 class="text-lg font-bold text-slate-800">Konfirmasi Penghapusan</h3>
+            <p class="my-4 text-slate-600">Apakah Anda yakin ingin menghapus siswa "<span id="student-name-to-delete" class="font-semibold"></span>"? Aksi ini tidak dapat dibatalkan.</p>
+            <div class="flex justify-end gap-3">
+                <button id="confirm-cancel-btn" class="px-5 py-2 bg-slate-200 rounded-lg hover:bg-slate-300">Batal</button>
+                <button id="confirm-delete-btn" class="px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Hapus</button>
+            </div>
         </div>
     </div>
 
-    <!-- PENTING: Cukup impor layout.js, ia akan menangani sisanya -->
     <script type="module" src="../js/layout.js"></script>
-    <!-- JavaScript Logic -->
     <script type="module">
         import { supabase } from '../js/supabase-client.js';
 
-        const displayNameElement = document.getElementById('display-name');
-        const logoutButton = document.getElementById('logout-button');
-        const studentListBody = document.getElementById('student-list-body');
-        const loadingStudentsElement = document.getElementById('loading-students').parentElement.parentElement;
-        const searchInput = document.getElementById('search-input');
-        const kelasFilter = document.getElementById('kelas-filter');
+        // --- State Aplikasi ---
+        let studentToDelete = { id: null, name: null };
+        let allStudents = [];
 
-          // PERUBAHAN 4: Logika untuk menu hamburger
-        const hamburgerBtn = document.getElementById('hamburger-btn');
-        const sidebar = document.getElementById('sidebar');
-        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        // --- Elemen DOM ---
+        const DOMElements = {
+            studentListBody: document.getElementById('student-list-body'),
+            tableStateContainer: document.getElementById('table-state-container'),
+            searchInput: document.getElementById('search-input'),
+            kelasFilter: document.getElementById('kelas-filter'),
+            toastContainer: document.getElementById('toast-container'),
+            // Modal
+            confirmModal: document.getElementById('confirm-modal'),
+            studentNameToDelete: document.getElementById('student-name-to-delete'),
+            confirmDeleteBtn: document.getElementById('confirm-delete-btn'),
+            confirmCancelBtn: document.getElementById('confirm-cancel-btn'),
+        };
+        
+        // --- Fungsi Utilitas ---
+        const showToast = (message, type = 'success') => {
+            const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
+            const toast = document.createElement('div');
+            toast.className = `p-4 rounded-lg text-white shadow-lg ${bgColor}`;
+            toast.textContent = message;
+            DOMElements.toastContainer.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        };
 
-        hamburgerBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('-translate-x-full');
-            sidebarOverlay.style.display = sidebar.classList.contains('-translate-x-full') ? 'none' : 'block';
-        });
-
-        sidebarOverlay.addEventListener('click', () => {
-            sidebar.classList.add('-translate-x-full');
-            sidebarOverlay.style.display = 'none';
-        });
-        async function handleDelete(studentId, studentName) {
-            if (confirm(`Apakah Anda yakin ingin menghapus siswa "${studentName}"?`)) {
-                const { error } = await supabase.rpc('delete_user_by_id', { user_id_to_delete: studentId });
-                if (error) {
-                    alert('Gagal menghapus siswa: ' + error.message);
-                } else {
-                    alert('Siswa berhasil dihapus.');
-                    fetchStudents();
-                }
+        const renderTableState = (state, message = '') => {
+            DOMElements.studentListBody.innerHTML = '';
+            if (state === 'loading') {
+                DOMElements.tableStateContainer.innerHTML = `<div class="flex justify-center items-center p-10"><div class="loader"></div></div>`;
+            } else if (state === 'empty') {
+                 DOMElements.tableStateContainer.innerHTML = `
+                    <div class="text-center p-10">
+                        <svg class="mx-auto h-12 w-12 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M15 21a6 6 0 00-9-5.197M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                        <h3 class="mt-2 text-sm font-medium text-slate-900">Data Tidak Ditemukan</h3>
+                        <p class="mt-1 text-sm text-slate-500">${message}</p>
+                    </div>`;
+            } else {
+                DOMElements.tableStateContainer.innerHTML = '';
             }
-        }
+        };
 
-        async function populateKelasFilter() {
-            const { data, error } = await supabase.from('users').select('kelas');
-            if (error) { console.error('Error fetching kelas list:', error); return; }
-            const kelasSet = new Set(data.map(item => item.kelas).filter(Boolean));
-            kelasFilter.innerHTML = '<option value="">Semua Kelas</option>';
-            kelasSet.forEach(kelas => {
-                const option = document.createElement('option');
-                option.value = kelas;
-                option.textContent = kelas;
-                kelasFilter.appendChild(option);
+        // --- Render Functions ---
+        const renderTable = (students) => {
+            if (students.length === 0) {
+                renderTableState('empty', 'Tidak ada siswa yang cocok dengan kriteria pencarian.');
+                return;
+            }
+            renderTableState('success');
+            DOMElements.studentListBody.innerHTML = students.map((student, index) => {
+                const tglDibuat = new Date(student.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+                return `
+                    <tr class="border-b hover:bg-slate-50">
+                        <td class="p-4 text-slate-500">${index + 1}</td>
+                        <td class="p-4 font-medium text-slate-900">${student.nama_lengkap}</td>
+                        <td class="p-4">${student.username}</td>
+                        <td class="p-4">${student.nisn || '-'}</td>
+                        <td class="p-4">${student.kelas || '-'}</td>
+                        <td class="p-4">${tglDibuat}</td>
+                        <td class="p-4 text-center">
+                            <a href="edit-siswa.html?id=${student.id}" class="text-indigo-600 hover:text-indigo-800 font-medium">Edit</a>
+                            <button data-id="${student.id}" data-name="${student.nama_lengkap}" class="delete-btn ml-4 text-red-600 hover:text-red-800 font-medium">Hapus</button>
+                        </td>
+                    </tr>`;
+            }).join('');
+            attachDeleteListeners();
+        };
+        
+        const applyFiltersAndRender = () => {
+            const searchTerm = DOMElements.searchInput.value.toLowerCase();
+            const filterKelas = DOMElements.kelasFilter.value;
+
+            const filteredStudents = allStudents.filter(student => {
+                const matchesSearch = student.nama_lengkap.toLowerCase().includes(searchTerm);
+                const matchesClass = !filterKelas || student.kelas === filterKelas;
+                return matchesSearch && matchesClass;
             });
-        }
+            renderTable(filteredStudents);
+        };
 
-        async function fetchStudents(searchTerm = '', filterKelas = '') {
-            // PERBAIKAN DI SINI: Menggunakan select('*') untuk mengambil semua data
-            let query = supabase
+        // --- Data Fetching & Handling ---
+        const populateKelasFilter = () => {
+            const kelasSet = new Set(allStudents.map(item => item.kelas).filter(Boolean));
+            DOMElements.kelasFilter.innerHTML = '<option value="">Semua Kelas</option>';
+            [...kelasSet].sort().forEach(kelas => {
+                DOMElements.kelasFilter.innerHTML += `<option value="${kelas}">${kelas}</option>`;
+            });
+        };
+
+        const fetchStudents = async () => {
+            renderTableState('loading');
+            
+            const { data, error } = await supabase
                 .from('users')
                 .select('*')
-                .eq('role', 'siswa');
-
-            if (searchTerm) { query = query.ilike('nama_lengkap', `%${searchTerm}%`); }
-            if (filterKelas) { query = query.eq('kelas', filterKelas); }
-            
-            query = query.order('created_at', { ascending: true });
-
-            const { data: students, error } = await query;
-
-            loadingStudentsElement.style.display = 'none';
-            studentListBody.innerHTML = '';
+                .eq('role', 'siswa')
+                .order('kelas', { ascending: true })
+                .order('nama_lengkap', { ascending: true });
 
             if (error) {
                 console.error('Error fetching students:', error);
-                studentListBody.innerHTML = '<tr><td colspan="7" class="px-6 py-4 text-center text-red-500">Gagal memuat data siswa.</td></tr>';
+                renderTableState('empty', 'Gagal memuat data siswa. Periksa koneksi Anda.');
                 return;
             }
+            allStudents = data;
+            populateKelasFilter();
+            applyFiltersAndRender();
+        };
 
-            if (students.length === 0) {
-                studentListBody.innerHTML = '<tr><td colspan="7" class="px-6 py-4 text-center text-gray-500">Tidak ada siswa yang cocok dengan kriteria.</td></tr>';
-            } else {
-                students.forEach((student, index) => {
-                    const studentRow = document.createElement('tr');
-                    const tglDibuat = new Date(student.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-                    
-                    studentRow.innerHTML = `
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${index + 1}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${student.nama_lengkap}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${student.username}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${student.nisn || '-'}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${student.kelas || '-'}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${tglDibuat}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <a href="edit-siswa.html?id=${student.id}" class="text-indigo-600 hover:text-indigo-900">Edit</a>
-                            <button data-id="${student.id}" data-name="${student.nama_lengkap}" class="delete-btn ml-4 text-red-600 hover:text-red-900">Hapus</button>
-                        </td>
-                    `;
-                    studentListBody.appendChild(studentRow);
-                });
-
-                document.querySelectorAll('.delete-btn').forEach(button => {
-                    button.addEventListener('click', (e) => {
-                        handleDelete(e.target.dataset.id, e.target.dataset.name);
-                    });
-                });
-            }
-        }
-
-        async function initializePage() {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) { window.location.href = '/login.html'; return; }
-            const { data: profile } = await supabase.from('users').select('nama_lengkap').eq('id', user.id).single();
-            if (profile) { displayNameElement.textContent = profile.nama_lengkap; }
+        const handleDelete = async () => {
+            const { error } = await supabase.rpc('delete_user_by_id', { user_id_to_delete: studentToDelete.id });
             
-            await populateKelasFilter();
+            DOMElements.confirmModal.classList.add('hidden');
+            if (error) {
+                showToast(`Gagal menghapus ${studentToDelete.name}.`, 'error');
+                console.error('Delete error:', error);
+            } else {
+                showToast(`Siswa ${studentToDelete.name} berhasil dihapus.`, 'success');
+                await fetchStudents(); // Refresh data
+            }
+            studentToDelete = { id: null, name: null };
+        };
+
+        // --- Event Listeners ---
+        const attachDeleteListeners = () => {
+             document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    studentToDelete.id = e.currentTarget.dataset.id;
+                    studentToDelete.name = e.currentTarget.dataset.name;
+                    DOMElements.studentNameToDelete.textContent = studentToDelete.name;
+                    DOMElements.confirmModal.classList.remove('hidden');
+                });
+            });
+        };
+        
+        const initializeEventListeners = () => {
+            DOMElements.searchInput.addEventListener('input', applyFiltersAndRender);
+            DOMElements.kelasFilter.addEventListener('change', applyFiltersAndRender);
+            
+            // Modal Listeners
+            DOMElements.confirmDeleteBtn.addEventListener('click', handleDelete);
+            DOMElements.confirmCancelBtn.addEventListener('click', () => {
+                DOMElements.confirmModal.classList.add('hidden');
+            });
+        };
+
+        // --- Inisialisasi ---
+        const initializePage = async () => {
+            // Cek user session (diasumsikan layout.js sudah menangani ini)
+            // Jika tidak, tambahkan pengecekan Supabase auth di sini
+            initializeEventListeners();
             await fetchStudents();
-
-            searchInput.addEventListener('input', () => fetchStudents(searchInput.value, kelasFilter.value));
-            kelasFilter.addEventListener('change', () => fetchStudents(searchInput.value, kelasFilter.value));
-        }
-
-        logoutButton.addEventListener('click', async () => {
-            await supabase.auth.signOut();
-            window.location.href = '/login.html';
-        });
-
+        };
+        
+        // Menunggu event dari layout.js atau langsung inisialisasi
         document.addEventListener('layoutReady', initializePage);
     </script>
 </body>
 </html>
+

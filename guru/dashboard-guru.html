@@ -13,7 +13,6 @@
 <body>
 
     <!-- KONTEN SPESIFIK UNTUK HALAMAN INI -->
-    <!-- Tata letak akan ditambahkan secara otomatis oleh layout.js -->
     <div class="p-6">
         <h2 id="welcome-message" class="text-3xl font-bold text-gray-800 mb-6">Memuat...</h2>
         
@@ -21,7 +20,11 @@
             <div class="bg-white p-6 rounded-lg shadow"><h4 class="text-sm font-medium text-gray-500">Jumlah Siswa</h4><p id="stat-jumlah-siswa" class="text-3xl font-bold text-indigo-600 mt-2">-</p></div>
             <div class="bg-white p-6 rounded-lg shadow"><h4 class="text-sm font-medium text-gray-500">Materi Dibuat</h4><p id="stat-jumlah-materi" class="text-3xl font-bold text-green-600 mt-2">-</p></div>
             <div class="bg-white p-6 rounded-lg shadow"><h4 class="text-sm font-medium text-gray-500">Latihan Dibuat</h4><p id="stat-jumlah-latihan" class="text-3xl font-bold text-blue-600 mt-2">-</p></div>
-            <div class="bg-white p-6 rounded-lg shadow"><h4 class="text-sm font-medium text-gray-500">Tugas Perlu Dinilai</h4><p id="stat-perlu-dinilai" class="text-3xl font-bold text-yellow-600 mt-2">-</p></div>
+            <!-- PERUBAHAN: Menambahkan wrapper <a> dan cursor-pointer -->
+            <a id="link-perlu-dinilai" href="rekap-nilai.html?filter=perlu_dinilai" class="block bg-white p-6 rounded-lg shadow hover:bg-gray-50 transition cursor-pointer">
+                <h4 class="text-sm font-medium text-gray-500">Tugas Perlu Dinilai</h4>
+                <p id="stat-perlu-dinilai" class="text-3xl font-bold text-yellow-600 mt-2">-</p>
+            </a>
         </div>
 
         <div class="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -33,14 +36,10 @@
         </div>
     </div>
     
-    <!-- PENTING: Cukup impor layout.js, ia akan menangani sisanya -->
     <script type="module" src="../js/layout.js"></script>
-
-    <!-- Skrip khusus untuk halaman ini -->
     <script type="module">
         import { supabase } from '../js/supabase-client.js';
 
-        // Kelompokkan elemen UI agar mudah diakses
         const ui = {
             welcome: document.getElementById('welcome-message'),
             statSiswa: document.getElementById('stat-jumlah-siswa'),
@@ -52,7 +51,6 @@
             rekapHadir: document.getElementById('rekap-kehadiran-list')
         };
 
-        // Fungsi untuk menampilkan pesan error langsung di UI
         const showError = (element, message) => {
             element.innerHTML = `<p class="text-sm text-red-500">${message}</p>`;
         };
@@ -60,7 +58,7 @@
         async function fetchDashboardStats() {
             try {
                 const { data, error } = await supabase.rpc('get_guru_dashboard_stats');
-                if (error) throw error; // Lemparkan error untuk ditangkap oleh catch block
+                if (error) throw error;
 
                 if (data && data.length > 0) {
                     const stats = data[0];
@@ -71,7 +69,6 @@
                 }
             } catch (error) {
                 console.error("Error fetching dashboard stats:", error);
-                // Tampilkan error di semua kartu statistik
                 showError(ui.statSiswa.parentElement, 'Gagal memuat statistik.');
             }
         }
@@ -140,4 +137,3 @@
     </script>
 </body>
 </html>
-
