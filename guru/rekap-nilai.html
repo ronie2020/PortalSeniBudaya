@@ -5,9 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rekap Nilai Terstruktur - Portal Guru</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/png" href="../assets/images/favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- PERUBAHAN: Menambahkan library SheetJS untuk membuat file Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
         .loader {
@@ -33,9 +36,7 @@
             <!-- Area Konten -->
             <main class="flex-1 overflow-y-auto p-6">
                 <!-- Dasbor Statistik -->
-                <div id="stats-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                    <!-- Cards will be injected by JS -->
-                </div>
+                <div id="stats-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6"></div>
 
                 <!-- Kontrol & Aksi -->
                 <div class="mb-6 p-4 bg-white rounded-lg shadow">
@@ -43,15 +44,19 @@
                         <div class="w-full sm:max-w-xs">
                             <input type="text" id="search-input" placeholder="Cari nama siswa atau tugas..." class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
                         </div>
-                        <div class="flex items-center gap-4 w-full sm:w-auto">
-                            <select id="filter-status" class="w-full sm:w-48 px-4 py-2 border border-slate-300 bg-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                        <div class="flex items-center gap-4 w-full sm:w-auto flex-wrap justify-end">
+                            <select id="filter-status" class="w-full sm:w-auto px-4 py-2 border border-slate-300 bg-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
                                 <option value="semua">Semua Status</option>
                                 <option value="perlu_dinilai">Perlu Dinilai</option>
                                 <option value="sudah_dinilai">Sudah Dinilai</option>
                             </select>
-                            <select id="filter-kelas" class="w-full sm:w-48 px-4 py-2 border border-slate-300 bg-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                            <select id="filter-kelas" class="w-full sm:w-auto px-4 py-2 border border-slate-300 bg-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
                                 <option value="semua">Semua Kelas</option>
                             </select>
+                            <!-- PERUBAHAN: Menambahkan tombol Export Excel -->
+                            <button id="export-excel-btn" class="w-full sm:w-auto px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold shadow transition whitespace-nowrap">
+                                Export Excel
+                            </button>
                             <button id="show-manual-input-btn" class="w-full sm:w-auto px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-semibold shadow transition whitespace-nowrap">
                                 Input Manual
                             </button>
@@ -91,7 +96,7 @@
         <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-lg mx-4">
             <div class="flex justify-between items-center pb-3 border-b">
                 <h3 class="text-xl font-bold text-slate-800" id="grade-modal-title">Beri Nilai</h3>
-                <button class="close-modal-btn text-3xl leading-none hover:text-red-600">&times;</button>
+                <button class="close-grade-modal-btn text-3xl leading-none hover:text-red-600">&times;</button>
             </div>
             <div class="mt-5 space-y-4">
                 <p><strong>Siswa:</strong> <span id="modal-student-name"></span></p>
@@ -107,12 +112,47 @@
                 </div>
             </div>
             <div class="mt-6 flex justify-end gap-3">
-                <button class="close-modal-btn px-4 py-2 bg-slate-200 rounded-lg hover:bg-slate-300">Batal</button>
+                <button class="close-grade-modal-btn px-4 py-2 bg-slate-200 rounded-lg hover:bg-slate-300">Batal</button>
                 <button id="save-grade-btn" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Simpan</button>
             </div>
         </div>
     </div>
-    <!-- ... sisa modal -->
+    
+    <div id="manual-input-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 hidden">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-lg mx-4">
+            <div class="flex justify-between items-center pb-3 border-b">
+                <h3 class="text-xl font-bold text-slate-800">Input Nilai Manual</h3>
+                <button class="close-manual-modal-btn text-3xl leading-none hover:text-red-600">&times;</button>
+            </div>
+            <form id="manual-grade-form" class="mt-5 space-y-4">
+                <div>
+                    <label for="select-student" class="block text-sm font-medium text-gray-700">Pilih Siswa</label>
+                    <select id="select-student" name="student" required class="mt-1 w-full border-slate-300 rounded-md shadow-sm">
+                        <option value="">Memuat siswa...</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="select-exercise" class="block text-sm font-medium text-gray-700">Pilih Latihan/Tugas</label>
+                    <select id="select-exercise" name="exercise" required class="mt-1 w-full border-slate-300 rounded-md shadow-sm">
+                         <option value="">Memuat latihan...</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="manual-nilai" class="block text-sm font-medium text-gray-700">Nilai</label>
+                    <input type="number" id="manual-nilai" name="nilai" required class="mt-1 w-full border-slate-300 rounded-md shadow-sm" placeholder="0-100">
+                </div>
+                <div>
+                    <label for="manual-feedback" class="block text-sm font-medium text-gray-700">Feedback (Opsional)</label>
+                    <textarea id="manual-feedback" name="feedback" rows="3" class="mt-1 w-full border-slate-300 rounded-md shadow-sm"></textarea>
+                </div>
+                <div class="mt-6 flex justify-end gap-3">
+                    <button type="button" class="close-manual-modal-btn px-6 py-2 bg-slate-200 rounded-lg hover:bg-slate-300">Batal</button>
+                    <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Simpan Nilai</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div id="toast-container" class="fixed top-5 right-5 z-50 space-y-2"></div>
 
     <script type="module" src="../js/layout.js"></script>
@@ -139,9 +179,15 @@
             modalNilai: document.getElementById('modal-nilai'),
             modalFeedback: document.getElementById('modal-feedback'),
             saveGradeBtn: document.getElementById('save-grade-btn'),
+            manualInputModal: document.getElementById('manual-input-modal'),
             showManualInputBtn: document.getElementById('show-manual-input-btn'),
+            manualGradeForm: document.getElementById('manual-grade-form'),
+            selectStudent: document.getElementById('select-student'),
+            selectExercise: document.getElementById('select-exercise'),
+            // PERUBAHAN: Menambahkan elemen tombol export
+            exportExcelBtn: document.getElementById('export-excel-btn'),
         };
-
+        
         const showToast = (message, type = 'success') => {
             const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
             const toast = document.createElement('div');
@@ -150,7 +196,6 @@
             DOMElements.toastContainer.appendChild(toast);
             setTimeout(() => toast.remove(), 3000);
         };
-        
         const renderStats = (data) => {
             const totalSubmissions = data.length;
             const needsGrading = data.filter(item => item.nilai === null).length;
@@ -166,7 +211,6 @@
                 <div class="bg-white p-5 rounded-lg shadow"><p class="text-sm text-slate-500">Jumlah Kelas</p><p class="text-2xl font-bold">${uniqueClasses}</p></div>
             `;
         };
-
         const renderTable = (data) => {
             DOMElements.tableLoader.classList.add('hidden');
             if (data.length === 0) {
@@ -182,24 +226,19 @@
                     <td class="p-4">${item.judul_latihan}</td>
                     <td class="p-4">${new Date(item.tgl_kumpul).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}</td>
                     <td class="p-4 text-center">
-                        ${item.nilai !== null
-                            ? '<span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Sudah Dinilai</span>'
-                            : '<span class="px-2 py-1 text-xs font-semibold text-orange-800 bg-orange-100 rounded-full">Perlu Dinilai</span>'
-                        }
+                        ${item.nilai !== null ? '<span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Sudah Dinilai</span>':'<span class="px-2 py-1 text-xs font-semibold text-orange-800 bg-orange-100 rounded-full">Perlu Dinilai</span>'}
                     </td>
                     <td class="p-4 text-center font-bold text-lg ${item.nilai !== null ? 'text-indigo-600' : 'text-slate-400'}">${item.nilai ?? '-'}</td>
                     <td class="p-4 text-center">
                         <div class="flex justify-center items-center gap-2">
                            <button class="grade-btn p-2 text-slate-500 hover:text-indigo-600" data-id="${item.hasil_id}" title="Beri/Edit Nilai"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg></button>
-                           <button class="delete-btn p-2 text-slate-500 hover:text-red-600" data-id="${item.hasil_id}" title="Hapus"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg></button>
+                           <button class="delete-btn p-2 text-slate-500 hover:text-red-600" data-id="${item.hasil_id}" title="Hapus"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h--3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg></button>
                         </div>
                     </td>
                 </tr>
             `).join('');
-            // PERBAIKAN: Memanggil fungsi untuk mengaktifkan tombol
             attachTableActionListeners();
         };
-        
         const populateClassFilter = (data) => {
             const classes = [...new Set(data.map(item => item.kelas_siswa).filter(Boolean))];
             DOMElements.filterKelas.innerHTML = '<option value="semua">Semua Kelas</option>';
@@ -210,7 +249,6 @@
                 DOMElements.filterKelas.appendChild(option);
             });
         };
-
         const fetchSubmissions = async () => {
             DOMElements.tableLoader.classList.remove('hidden');
             DOMElements.emptyState.classList.add('hidden');
@@ -229,7 +267,6 @@
             populateClassFilter(allSubmissionsData);
             applyFiltersAndRender();
         };
-        
         const applyFiltersAndRender = () => {
             const searchTerm = DOMElements.searchInput.value.toLowerCase();
             const selectedClass = DOMElements.filterKelas.value;
@@ -245,7 +282,6 @@
             renderTable(filteredData);
         };
         
-        // PERBAIKAN: Menambahkan definisi fungsi attachTableActionListeners
         const attachTableActionListeners = () => {
             document.querySelectorAll('.grade-btn').forEach(btn => {
                 btn.onclick = (e) => {
@@ -255,16 +291,90 @@
                         DOMElements.gradeModalTitle.textContent = submission.nilai === null ? 'Beri Nilai' : 'Edit Nilai';
                         DOMElements.modalStudentName.textContent = submission.nama_siswa;
                         DOMElements.modalExerciseTitle.textContent = submission.judul_latihan;
-                        DOMElements.modalSubmissionLink.innerHTML = submission.submission_content 
-                            ? `<a href="${submission.submission_content}" target="_blank" class="text-blue-600 hover:underline break-all">Lihat Jawaban Siswa</a>` 
-                            : '';
+                        DOMElements.modalSubmissionLink.innerHTML = submission.submission_content ? `<a href="${submission.submission_content}" target="_blank" class="text-blue-600 hover:underline break-all">Lihat Jawaban Siswa</a>` : '';
                         DOMElements.modalNilai.value = submission.nilai ?? '';
                         DOMElements.modalFeedback.value = submission.feedback ?? '';
                         DOMElements.gradeModal.classList.remove('hidden');
                     }
                 };
             });
-            // tambahkan listener untuk tombol hapus di sini jika perlu
+        };
+        
+        const populateManualInputDropdowns = async () => {
+            const { data: students, error: studentError } = await supabase.from('users').select('id, nama_lengkap, kelas').eq('role', 'siswa').order('nama_lengkap');
+            if(studentError) return console.error(studentError);
+            DOMElements.selectStudent.innerHTML = '<option value="">Pilih Siswa</option>';
+            students.forEach(s => DOMElements.selectStudent.innerHTML += `<option value="${s.id}">${s.nama_lengkap} (${s.kelas || 'Tanpa Kelas'})</option>`);
+            const { data: exercises, error: exerciseError } = await supabase.from('latihan').select('id, judul').order('judul');
+            if(exerciseError) return console.error(exerciseError);
+            DOMElements.selectExercise.innerHTML = '<option value="">Pilih Latihan</option>';
+            exercises.forEach(e => DOMElements.selectExercise.innerHTML += `<option value="${e.id}">${e.judul}</option>`);
+        };
+
+        const handleManualGradeSubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const studentId = formData.get('student');
+            const exerciseId = formData.get('exercise');
+            const nilai = parseInt(formData.get('nilai'));
+            const feedback = formData.get('feedback');
+            if (isNaN(nilai) || nilai < 0 || nilai > 100) return showToast('Nilai harus antara 0 dan 100.', 'error');
+            const { data: existing, error: checkError } = await supabase.from('hasil_latihan').select('id').eq('user_id', studentId).eq('latihan_id', exerciseId).single();
+            let result;
+            if (existing) {
+                result = await supabase.from('hasil_latihan').update({ nilai, feedback, created_at: new Date() }).eq('id', existing.id);
+            } else {
+                result = await supabase.from('hasil_latihan').insert([{ user_id: studentId, latihan_id: exerciseId, nilai, feedback, created_at: new Date() }]);
+            }
+            if (result.error) {
+                showToast('Gagal menyimpan nilai manual.', 'error');
+                console.error(result.error);
+            } else {
+                showToast('Nilai manual berhasil disimpan!');
+                DOMElements.manualInputModal.classList.add('hidden');
+                e.target.reset();
+                fetchSubmissions();
+            }
+        };
+        
+        // PERUBAHAN: Fungsi baru untuk export ke Excel
+        const exportToExcel = () => {
+            // Mengambil data yang sedang ditampilkan di tabel berdasarkan filter
+            const searchTerm = DOMElements.searchInput.value.toLowerCase();
+            const selectedClass = DOMElements.filterKelas.value;
+            const selectedStatus = DOMElements.filterStatus.value;
+            const filteredData = allSubmissionsData.filter(item => {
+                const matchesSearch = item.nama_siswa.toLowerCase().includes(searchTerm) || item.judul_latihan.toLowerCase().includes(searchTerm);
+                const matchesClass = selectedClass === 'semua' || item.kelas_siswa === selectedClass;
+                let matchesStatus = true;
+                if (selectedStatus === 'perlu_dinilai') matchesStatus = item.nilai === null;
+                else if (selectedStatus === 'sudah_dinilai') matchesStatus = item.nilai !== null;
+                return matchesSearch && matchesClass && matchesStatus;
+            });
+
+            if (filteredData.length === 0) {
+                return showToast('Tidak ada data untuk diekspor.', 'error');
+            }
+
+            // Memformat data agar sesuai dengan kolom Excel
+            const dataToExport = filteredData.map(item => ({
+                'Nama Siswa': item.nama_siswa,
+                'Kelas': item.kelas_siswa,
+                'Judul Tugas': item.judul_latihan,
+                'Tanggal Kumpul': new Date(item.tgl_kumpul).toLocaleString('id-ID'),
+                'Status': item.nilai === null ? 'Perlu Dinilai' : 'Sudah Dinilai',
+                'Nilai': item.nilai,
+                'Feedback': item.feedback,
+                'Link Jawaban': item.submission_content,
+            }));
+            
+            // Membuat worksheet dan workbook menggunakan SheetJS
+            const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Rekap Nilai");
+            
+            // Mengunduh file Excel
+            XLSX.writeFile(workbook, `Rekap_Nilai_${new Date().toISOString().slice(0,10)}.xlsx`);
         };
 
         const setupEventListeners = () => {
@@ -272,40 +382,39 @@
             DOMElements.filterKelas.addEventListener('change', applyFiltersAndRender);
             DOMElements.filterStatus.addEventListener('change', applyFiltersAndRender);
             DOMElements.showManualInputBtn.addEventListener('click', () => {
-                showToast('Fitur input manual akan ditampilkan di sini.', 'success');
+                populateManualInputDropdowns();
+                DOMElements.manualInputModal.classList.remove('hidden');
             });
-            // Listener untuk modal
+            // PERUBAHAN: Menambahkan event listener untuk tombol export
+            DOMElements.exportExcelBtn.addEventListener('click', exportToExcel);
+
             DOMElements.saveGradeBtn.addEventListener('click', handleSaveGrade);
-            document.querySelectorAll('.close-modal-btn').forEach(btn => {
-                btn.onclick = () => DOMElements.gradeModal.classList.add('hidden');
-            });
+            document.querySelectorAll('.close-grade-modal-btn').forEach(btn => btn.onclick = () => DOMElements.gradeModal.classList.add('hidden'));
+            
+            DOMElements.manualGradeForm.addEventListener('submit', handleManualGradeSubmit);
+            document.querySelectorAll('.close-manual-modal-btn').forEach(btn => btn.onclick = () => DOMElements.manualInputModal.classList.add('hidden'));
         };
 
-        // PERBAIKAN: Menambahkan fungsi handleSaveGrade
         const handleSaveGrade = async () => {
             const nilai = parseInt(DOMElements.modalNilai.value);
             const feedback = DOMElements.modalFeedback.value;
             if (isNaN(nilai) || nilai < 0 || nilai > 100) {
                 return showToast('Nilai harus antara 0 dan 100.', 'error');
             }
-            const { error } = await supabase
-                .from('hasil_latihan')
-                .update({ nilai, feedback })
-                .eq('id', currentSubmissionId);
-
+            const { error } = await supabase.from('hasil_latihan').update({ nilai, feedback }).eq('id', currentSubmissionId);
             if (error) {
                 showToast('Gagal menyimpan nilai.', 'error');
             } else {
                 showToast('Nilai berhasil disimpan!');
                 DOMElements.gradeModal.classList.add('hidden');
-                fetchSubmissions(); // Refresh data
+                fetchSubmissions();
             }
         };
         
         const initializePage = async () => {
             const urlParams = new URLSearchParams(window.location.search);
             const filterFromUrl = urlParams.get('filter');
-            setupEventListeners(); // Pindahkan setup listener ke atas
+            setupEventListeners();
             await fetchSubmissions(); 
             if (filterFromUrl === 'perlu_dinilai') {
                 DOMElements.filterStatus.value = 'perlu_dinilai';

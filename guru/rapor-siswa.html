@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapor Siswa - Portal Guru</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/png" href="../assets/images/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4f46e5;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800">
+
+    <!-- Area Konten -->
+    <main class="flex-1 overflow-y-auto p-6">
+        <h1 class="text-2xl font-bold mb-6">Rapor Siswa</h1>
+        
+        <!-- Filter dan Pencarian -->
+        <div class="mb-6 p-4 bg-white rounded-lg shadow">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <input type="text" id="search-input" placeholder="Cari nama siswa..." class="w-full sm:max-w-xs px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                <select id="filter-kelas" class="w-full sm:w-48 px-4 py-2 border border-slate-300 bg-white rounded-lg focus:ring-2 focus:ring-indigo-500">
+                    <option value="semua">Semua Kelas</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Kontainer Rapor Siswa -->
+        <div id="reports-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Kartu rapor akan dimuat di sini -->
+        </div>
+
+        <div id="loader-container" class="flex justify-center items-center p-10">
+            <div class="loader"></div>
+        </div>
+        <div id="empty-state" class="text-center p-10 hidden">
+            <h3 class="text-lg font-medium text-slate-900">Tidak Ada Siswa</h3>
+            <p class="mt-1 text-sm text-slate-500">Tidak ada data siswa yang cocok dengan filter Anda.</p>
+        </div>
+    </main>
+
+    <script type="module" src="../js/layout.js"></script>
+    <script type="module">
+        import { supabase } from '../js/supabase-client.js';
+
+        let allStudentReports = [];
+
+        const DOMElements = {
+            reportsContainer: document.getElementById('reports-container'),
+            loader: document.getElementById('loader-container'),
+            emptyState: document.getElementById('empty-state'),
+            searchInput: document.getElementById('search-input'),
+            filterKelas: document.getElementById('filter-kelas'),
+        };
+
+        const renderReports = (reports) => {
+            DOMElements.loader.classList.add('hidden');
+            if (reports.length === 0) {
+                DOMElements.emptyState.classList.remove('hidden');
+                DOMElements.reportsContainer.innerHTML = '';
+                return;
+            }
+            DOMElements.emptyState.classList.add('hidden');
+
+            DOMElements.reportsContainer.innerHTML = reports.map(student => {
+                const avgScore = parseFloat(student.rata_rata_nilai);
+                let scoreColor = 'text-slate-700';
+                if (avgScore >= 80) scoreColor = 'text-green-600';
+                else if (avgScore >= 60) scoreColor = 'text-yellow-600';
+                else if (avgScore > 0) scoreColor = 'text-red-600';
+
+                const taskDetailsHtml = student.detail_tugas.length > 0
+                    ? student.detail_tugas.map(tugas => `
+                        <li class="flex justify-between items-center py-2 border-b last:border-b-0">
+                            <span class="text-sm text-slate-600">${tugas.judul_latihan}</span>
+                            <span class="font-semibold text-sm ${tugas.nilai >= 75 ? 'text-green-700' : 'text-red-700'}">${tugas.nilai}</span>
+                        </li>
+                    `).join('')
+                    : '<p class="text-sm text-slate-400 text-center py-4">Belum ada tugas yang dikerjakan.</p>';
+
+                return `
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <div class="p-4 border-b bg-slate-50">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h3 class="font-bold text-lg">${student.nama_lengkap}</h3>
+                                    <p class="text-sm text-slate-500">${student.kelas || 'Tanpa Kelas'}</p>
+                                </div>
+                                <div class="text-right">
+                                     <p class="text-xs text-slate-500">Rata-rata</p>
+                                     <p class="font-bold text-2xl ${scoreColor}">${avgScore.toFixed(1)}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <h4 class="font-semibold text-sm mb-2">Rincian Tugas:</h4>
+                            <ul class="space-y-1">${taskDetailsHtml}</ul>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        };
+
+        const applyFiltersAndRender = () => {
+            const searchTerm = DOMElements.searchInput.value.toLowerCase();
+            const selectedClass = DOMElements.filterKelas.value;
+
+            const filteredReports = allStudentReports.filter(student => {
+                const matchesSearch = student.nama_lengkap.toLowerCase().includes(searchTerm);
+                const matchesClass = selectedClass === 'semua' || student.kelas === selectedClass;
+                return matchesSearch && matchesClass;
+            });
+            renderReports(filteredReports);
+        };
+        
+        const populateClassFilter = (reports) => {
+            const classes = [...new Set(reports.map(item => item.kelas).filter(Boolean))];
+            DOMElements.filterKelas.innerHTML = '<option value="semua">Semua Kelas</option>';
+            classes.sort().forEach(className => {
+                const option = document.createElement('option');
+                option.value = className;
+                option.textContent = className;
+                DOMElements.filterKelas.appendChild(option);
+            });
+        };
+
+        const setupEventListeners = () => {
+            DOMElements.searchInput.addEventListener('input', applyFiltersAndRender);
+            DOMElements.filterKelas.addEventListener('change', applyFiltersAndRender);
+        };
+        
+        const initializePage = async () => {
+            const { data, error } = await supabase.rpc('get_student_reports');
+            
+            if (error) {
+                console.error('Error fetching student reports:', error);
+                DOMElements.loader.innerHTML = '<p class="text-red-500">Gagal memuat data rapor.</p>';
+                return;
+            }
+            
+            allStudentReports = data;
+            populateClassFilter(allStudentReports);
+            applyFiltersAndRender();
+        };
+
+        document.addEventListener('layoutReady', () => {
+            setupEventListeners();
+            initializePage();
+        });
+    </script>
+</body>
+</html>
