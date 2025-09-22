@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- PERUBAHAN: Menambahkan library SheetJS untuk membuat file Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
         .loader {
@@ -26,7 +28,13 @@
 
     <!-- Area Konten -->
     <main class="flex-1 overflow-y-auto p-6">
-        <h1 class="text-2xl font-bold mb-6">Rapor Siswa</h1>
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+            <h1 class="text-2xl font-bold">Rapor Siswa</h1>
+            <!-- PERUBAHAN: Menambahkan tombol Export Excel -->
+            <button id="export-excel-btn" class="mt-4 sm:mt-0 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold shadow transition whitespace-nowrap">
+                Export Semua Rapor ke Excel
+            </button>
+        </div>
         
         <!-- Filter dan Pencarian -->
         <div class="mb-6 p-4 bg-white rounded-lg shadow">
@@ -64,6 +72,7 @@
             emptyState: document.getElementById('empty-state'),
             searchInput: document.getElementById('search-input'),
             filterKelas: document.getElementById('filter-kelas'),
+            exportExcelBtn: document.getElementById('export-excel-btn'),
         };
 
         const renderReports = (reports) => {
@@ -137,9 +146,65 @@
             });
         };
 
+        // PERUBAHAN: Fungsi baru untuk export ke Excel
+        const exportToExcel = () => {
+            if (allStudentReports.length === 0) {
+                alert('Tidak ada data untuk diekspor.');
+                return;
+            }
+
+            // Siapkan satu array besar untuk semua baris data
+            const allRows = [];
+            
+            // Header untuk file Excel
+            allRows.push(['Nama Siswa', 'Kelas', 'Rata-Rata Nilai', 'Judul Tugas', 'Nilai Tugas']);
+
+            // Loop melalui setiap siswa
+            allStudentReports.forEach(student => {
+                if (student.detail_tugas.length > 0) {
+                    // Loop melalui setiap tugas dari siswa
+                    student.detail_tugas.forEach((tugas, index) => {
+                        // Baris pertama untuk siswa ini mencantumkan nama, kelas, dan rata-rata
+                        if (index === 0) {
+                             allRows.push([
+                                student.nama_lengkap,
+                                student.kelas,
+                                parseFloat(student.rata_rata_nilai).toFixed(2),
+                                tugas.judul_latihan,
+                                tugas.nilai
+                            ]);
+                        } else {
+                            // Baris berikutnya hanya mencantumkan detail tugas
+                            allRows.push([
+                                '', // Kosongkan nama
+                                '', // Kosongkan kelas
+                                '', // Kosongkan rata-rata
+                                tugas.judul_latihan,
+                                tugas.nilai
+                            ]);
+                        }
+                    });
+                } else {
+                    // Jika siswa belum mengerjakan tugas
+                    allRows.push([student.nama_lengkap, student.kelas, parseFloat(student.rata_rata_nilai).toFixed(2), 'Belum ada tugas', '']);
+                }
+                // Tambahkan baris kosong sebagai pemisah antar siswa
+                allRows.push([]); 
+            });
+
+            const worksheet = XLSX.utils.aoa_to_sheet(allRows);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Rapor Siswa");
+            
+            // Mengunduh file Excel
+            XLSX.writeFile(workbook, `Rapor_Semua_Siswa_${new Date().toISOString().slice(0,10)}.xlsx`);
+        };
+
+
         const setupEventListeners = () => {
             DOMElements.searchInput.addEventListener('input', applyFiltersAndRender);
             DOMElements.filterKelas.addEventListener('change', applyFiltersAndRender);
+            DOMElements.exportExcelBtn.addEventListener('click', exportToExcel);
         };
         
         const initializePage = async () => {
@@ -163,3 +228,4 @@
     </script>
 </body>
 </html>
+
