@@ -3,110 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nilai Saya - Portal Belajar</title>
+    <title>Analisis Nilai Saya - Portal Belajar</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/png" href="../assets/images/favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style> body { font-family: 'Inter', sans-serif; } </style>
+    <!-- PERUBAHAN: Menambahkan library Chart.js untuk membuat grafik -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style> 
+        body { font-family: 'Inter', sans-serif; } 
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4f46e5;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
 </head>
-<body>
+<body class="bg-slate-50">
 
-    <!-- KONTEN INTI UNTUK HALAMAN INI -->
-    <div class="p-6">
+    <main class="p-6">
+        <h1 class="text-3xl font-bold text-gray-900 mb-6">Analisis Nilai Saya</h1>
+
+        <section id="stats-section" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Kartu statistik akan diisi oleh JS -->
+            <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200"><h2 class="text-sm font-medium text-slate-500">Tugas Dikerjakan</h2><p id="tugas-dikerjakan" class="text-3xl font-bold text-indigo-600 mt-2">-</p></div>
+            <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200"><h2 class="text-sm font-medium text-slate-500">Rata-Rata Nilai Saya</h2><p id="rata-rata-nilai" class="text-3xl font-bold text-green-600 mt-2">-</p></div>
+            <!-- PERUBAHAN: Kartu baru untuk Rata-Rata Kelas -->
+            <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200"><h2 class="text-sm font-medium text-slate-500">Rata-Rata Kelas</h2><p id="rata-rata-kelas" class="text-3xl font-bold text-blue-600 mt-2">-</p></div>
+            <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200"><h2 class="text-sm font-medium text-slate-500">Predikat</h2><p id="predikat" class="text-3xl font-bold text-yellow-500 mt-2">-</p></div>
+        </section>
+        
+        <!-- PERUBAHAN: Menambahkan Grafik dan Saran -->
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md border border-slate-200">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Grafik Tren Nilai</h2>
+                <div class="h-80">
+                    <canvas id="nilaiChart"></canvas>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200 flex flex-col justify-center">
+                 <h2 class="text-xl font-bold text-gray-800 mb-4">Saran Untukmu</h2>
+                 <div id="saran-container" class="text-center">
+                    <!-- Saran akan diisi oleh JS -->
+                 </div>
+            </div>
+        </section>
+
         <section>
-            <h1 class="text-3xl font-bold text-gray-900 mb-6">Rekapitulasi Nilai</h1>
-            <div class="bg-white p-6 rounded-lg shadow-md overflow-x-auto">
+             <h2 class="text-2xl font-bold text-gray-800 mb-4">Rincian Nilai</h2>
+            <div class="bg-white rounded-lg shadow-md overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Judul Latihan</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Pengerjaan</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nilai</th>
+                            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Nilai Saya</th>
+                            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Rata-Rata Kelas</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Feedback Guru</th>
                         </tr>
                     </thead>
-                    <tbody id="nilai-list-body" class="bg-white divide-y divide-gray-200">
-                        <tr>
-                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">
-                                <p id="loading-nilai">Memuat data nilai...</p>
-                            </td>
-                        </tr>
-                    </tbody>
+                    <tbody id="nilai-list-body" class="bg-white divide-y divide-gray-200"></tbody>
                 </table>
+                <div id="loader-container" class="flex justify-center items-center p-10"><div class="loader"></div></div>
             </div>
         </section>
-    </div>
+    </main>
     
-    <!-- Panggil Layout & Skrip Halaman -->
     <script type="module" src="../js/layout-siswa.js"></script>
     <script type="module">
         import { supabase } from '../js/supabase-client.js';
 
-        const nilaiListBody = document.getElementById('nilai-list-body');
-        const loadingNilaiElement = document.getElementById('loading-nilai').parentElement.parentElement;
+        const DOMElements = {
+            nilaiListBody: document.getElementById('nilai-list-body'),
+            loaderContainer: document.getElementById('loader-container'),
+            tugasDikerjakan: document.getElementById('tugas-dikerjakan'),
+            rataRataNilai: document.getElementById('rata-rata-nilai'),
+            rataRataKelas: document.getElementById('rata-rata-kelas'),
+            predikat: document.getElementById('predikat'),
+            saranContainer: document.getElementById('saran-container'),
+            chartCanvas: document.getElementById('nilaiChart'),
+        };
+        let nilaiChartInstance = null;
 
-        async function fetchNilai(user) {
-            const { data: hasil, error } = await supabase
-                .from('hasil_latihan')
-                .select(`
-                    created_at,
-                    nilai,
-                    feedback,
-                    latihan ( judul )
-                `)
-                .eq('user_id', user.id)
-                .order('created_at', { ascending: false });
+        const getPredikat = (rataRata) => {
+            if (rataRata >= 90) return { text: 'Istimewa', color: 'text-cyan-500' };
+            if (rataRata >= 80) return { text: 'Sangat Baik', color: 'text-green-500' };
+            if (rataRata >= 70) return { text: 'Baik', color: 'text-blue-500' };
+            if (rataRata > 0) return { text: 'Tingkatkan!', color: 'text-orange-500' };
+            return { text: '-', color: 'text-slate-500' };
+        };
+        
+        const renderSaran = (rataRata) => {
+            let icon, message;
+            if (rataRata >= 80) {
+                icon = '🥳';
+                message = '<p class="text-slate-600">Kerja bagus! Kamu secara konsisten menunjukkan pemahaman yang mendalam. Pertahankan prestasimu!</p>';
+            } else if (rataRata >= 70) {
+                icon = '👍';
+                message = '<p class="text-slate-600">Kamu sudah di jalur yang benar. Terus asah kemampuanmu untuk hasil yang lebih maksimal.</p>';
+            } else if (rataRata > 0) {
+                icon = '💪';
+                message = '<p class="text-slate-600">Jangan menyerah! Coba ulangi materi di mana nilaimu rendah dan jangan ragu bertanya pada guru.</p>';
+            } else {
+                icon = '📚';
+                message = '<p class="text-slate-500">Mulai kerjakan tugas untuk melihat progres belajarmu di sini.</p>';
+            }
+            DOMElements.saranContainer.innerHTML = `<p class="text-6xl mb-4">${icon}</p>${message}`;
+        };
 
-            loadingNilaiElement.style.display = 'none';
-            nilaiListBody.innerHTML = '';
+        const renderChart = (data) => {
+            if (nilaiChartInstance) {
+                nilaiChartInstance.destroy();
+            }
+            const ctx = DOMElements.chartCanvas.getContext('2d');
+            nilaiChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(item => item.judul_latihan),
+                    datasets: [
+                        {
+                            label: 'Nilai Saya',
+                            data: data.map(item => item.nilai),
+                            borderColor: 'rgb(79, 70, 229)',
+                            backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                            fill: true,
+                            tension: 0.3,
+                        },
+                        {
+                            label: 'Rata-Rata Kelas',
+                            data: data.map(item => item.rata_rata_kelas),
+                            borderColor: 'rgb(5, 150, 105)',
+                            backgroundColor: 'rgba(5, 150, 105, 0.1)',
+                            borderDash: [5, 5],
+                            tension: 0.3,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true, max: 100 } }
+                }
+            });
+        };
+
+        const fetchNilai = async (user) => {
+            // PERUBAHAN: Memanggil fungsi RPC baru
+            const { data: hasil, error } = await supabase.rpc('get_student_nilai_details', { p_user_id: user.id });
+
+            DOMElements.loaderContainer.style.display = 'none';
+            DOMElements.nilaiListBody.innerHTML = '';
 
             if (error) {
                 console.error('Error fetching nilai:', error);
-                nilaiListBody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-red-500">Gagal memuat data nilai.</td></tr>';
+                DOMElements.nilaiListBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-red-500">Gagal memuat data nilai.</td></tr>';
                 return;
             }
 
             if (hasil.length === 0) {
-                nilaiListBody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">Anda belum mengerjakan latihan apapun.</td></tr>';
+                DOMElements.nilaiListBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-500">Anda belum mengerjakan latihan apapun.</td></tr>';
+                 renderSaran(0);
             } else {
-                hasil.forEach(item => {
-                    const nilaiRow = document.createElement('tr');
-                    const tglPengerjaan = new Date(item.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-                    
-                    let statusHtml, nilaiHtml;
+                // Kalkulasi statistik
+                const dinilai = hasil.filter(item => item.nilai !== null);
+                const rataRataSaya = dinilai.length > 0 ? dinilai.reduce((acc, item) => acc + item.nilai, 0) / dinilai.length : 0;
+                const rataRataKelas = dinilai.length > 0 ? dinilai.reduce((acc, item) => acc + (parseFloat(item.rata_rata_kelas) || 0), 0) / dinilai.length : 0;
+                
+                // Render semua komponen
+                DOMElements.tugasDikerjakan.textContent = hasil.length;
+                DOMElements.rataRataNilai.textContent = rataRataSaya.toFixed(1);
+                DOMElements.rataRataKelas.textContent = rataRataKelas.toFixed(1);
+                const predikatInfo = getPredikat(rataRataSaya);
+                DOMElements.predikat.textContent = predikatInfo.text;
+                DOMElements.predikat.className = 'text-3xl font-bold mt-2 ' + predikatInfo.color;
 
-                    if (item.nilai !== null) {
-                        statusHtml = '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Selesai Dinilai</span>';
-                        nilaiHtml = `<span class="text-lg font-bold text-gray-900">${item.nilai}</span>`;
-                    } else {
-                        statusHtml = '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Menunggu Penilaian</span>';
-                        nilaiHtml = '<span class="text-sm text-gray-500">-</span>';
-                    }
+                renderSaran(rataRataSaya);
+                renderChart(hasil);
 
-                    nilaiRow.innerHTML = `
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.latihan.judul}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${tglPengerjaan}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${statusHtml}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${nilaiHtml}</td>
-                        <td class="px-6 py-4 whitespace-normal text-sm text-gray-500">${item.feedback || '-'}</td>
+                // Render tabel
+                hasil.reverse().forEach(item => { // Dibalik agar terbaru di atas
+                    DOMElements.nilaiListBody.innerHTML += `
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-4 font-medium text-slate-900">${item.judul_latihan}</td>
+                            <td class="p-4 text-center font-bold text-lg ${item.nilai > item.rata_rata_kelas ? 'text-green-600' : 'text-red-600'}">${item.nilai ?? '-'}</td>
+                            <td class="p-4 text-center text-slate-500">${parseFloat(item.rata_rata_kelas).toFixed(1) ?? '-'}</td>
+                            <td class="p-4 text-sm text-slate-600">${item.feedback || '-'}</td>
+                        </tr>
                     `;
-                    nilaiListBody.appendChild(nilaiRow);
                 });
             }
-        }
+        };
 
-        function initializePage(event) {
-            // Dapatkan data 'user' dari event 'layoutReady'
+        const initializePage = (event) => {
             const { user } = event.detail;
-            if (user) {
-                fetchNilai(user);
-            }
-        }
+            if (user) fetchNilai(user);
+        };
 
-        // Tunggu sinyal dari layout sebelum menjalankan skrip
         document.addEventListener('layoutReady', initializePage);
     </script>
 </body>
 </html>
+
