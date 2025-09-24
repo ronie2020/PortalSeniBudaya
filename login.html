@@ -30,15 +30,20 @@
                 <input type="email" id="email" name="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" required placeholder="contoh@email.com">
             </div>
             
+            <!-- ================================================== -->
+            <!-- BAGIAN PASSWORD YANG DIPERBARUI -->
+            <!-- ================================================== -->
             <div class="mb-6">
                 <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
                 <div class="relative">
                     <input type="password" id="password" name="password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 pr-10" required placeholder="********">
                     <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500 hover:text-gray-700 focus:outline-none">
+                        <!-- Ikon mata terbuka -->
                         <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                             <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
                             <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.022 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
                         </svg>
+                        <!-- Ikon mata tertutup (tersembunyi secara default) -->
                         <svg id="eye-off-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden" viewBox="0 0 20 20" fill="currentColor">
                            <path d="M10 12.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z"/>
                            <path fill-rule="evenodd" d="M.664 10.59a1.651 1.651 0 0 1 0-1.18l.88-1.42a1.65 1.65 0 0 1 1.54-.88H4.49a1.65 1.65 0 0 1 1.54.88l.88 1.42a1.651 1.651 0 0 1 0 1.18l-.88 1.42a1.65 1.65 0 0 1-1.54.88H2.94a1.65 1.65 0 0 1-1.54-.88l-.88-1.42Z M17.06 10.59a1.651 1.651 0 0 1 0-1.18l.88-1.42a1.65 1.65 0 0 1 1.54-.88H21.5a1.65 1.65 0 0 1 1.54.88l.88 1.42a1.651 1.651 0 0 1 0 1.18l-.88 1.42a1.65 1.65 0 0 1-1.54.88h-1.51a1.65 1.65 0 0 1-1.54-.88l-.88-1.42Z" clip-rule="evenodd"/>
@@ -47,18 +52,13 @@
                 </div>
             </div>
             
-            <!-- ================================================== -->
-            <!-- TOMBOL LOGIN YANG DIPERBARUI DENGAN SPINNER -->
-            <!-- ================================================== -->
-            <button type="submit" id="login-button" class="w-full flex items-center justify-center bg-indigo-600 text-white py-2.5 rounded-lg font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200 disabled:opacity-75 disabled:cursor-not-allowed">
-                <svg id="login-spinner" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <span id="login-button-text">Login</span>
+            <!-- Tombol Login -->
+            <button type="submit" class="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200">
+                Login
             </button>
         </form>
         
+        <!-- Pesan Error -->
         <div id="error-message" class="mt-4 text-center text-red-600 text-sm"></div>
 
         <div class="text-center mt-6">
@@ -67,75 +67,63 @@
     </div>
 
     <!-- ================================================== -->
-    <!-- SCRIPT UTAMA - SUPABASE (DIPERBARUI DENGAN LOADING STATE) -->
+    <!-- SCRIPT UTAMA - SUPABASE -->
     <!-- ================================================== -->
     <script type="module">
+        // Impor variabel 'supabase' dari file client
         import { supabase } from './js/supabase-client.js';
 
         const loginForm = document.getElementById('login-form');
         const errorMessage = document.getElementById('error-message');
-        const loginButton = document.getElementById('login-button');
-        const loginSpinner = document.getElementById('login-spinner');
-        const loginButtonText = document.getElementById('login-button-text');
 
         loginForm.addEventListener('submit', async (event) => {
-            event.preventDefault(); 
-            
-            // --- Memulai Loading State ---
-            loginButton.disabled = true;
-            loginSpinner.classList.remove('hidden');
-            loginButtonText.textContent = 'Memproses...';
-            errorMessage.textContent = ''; // Bersihkan pesan error
+            event.preventDefault(); // Mencegah form mengirim data secara tradisional
 
             const email = loginForm.email.value;
             const password = loginForm.password.value;
-            
-            try {
-                const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
-                    email: email,
-                    password: password,
-                });
+            errorMessage.textContent = ''; // Bersihkan pesan error sebelumnya
 
-                if (loginError) {
-                    console.error('Login Error:', loginError.message);
-                    errorMessage.textContent = 'Login Gagal: Periksa kembali email dan password Anda.';
-                    return;
-                }
+            // Proses Login menggunakan Supabase
+            const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password,
+            });
 
-                const { data: profile, error: profileError } = await supabase
-                    .from('users')
-                    .select('role')
-                    .eq('id', loginData.user.id)
-                    .single();
+            if (loginError) {
+                console.error('Login Error:', loginError.message);
+                errorMessage.textContent = 'Login Gagal: Periksa kembali email dan password Anda.';
+                return;
+            }
 
-                if (profileError) {
-                    console.error('Profile Error:', profileError.message);
-                    errorMessage.textContent = 'Gagal mengambil data pengguna. Hubungi admin.';
-                    await supabase.auth.signOut();
-                    return;
-                }
+            // Jika login berhasil, ambil role pengguna
+            const { data: profile, error: profileError } = await supabase
+                .from('users')
+                .select('role')
+                .eq('id', loginData.user.id)
+                .single();
 
-                if (profile.role === 'guru') {
-                    window.location.href = '/guru/dashboard-guru.html';
-                } else if (profile.role === 'siswa') {
-                    window.location.href = '/siswa/dashboard-siswa.html';
-                } else {
-                    errorMessage.textContent = 'Role tidak dikenali.';
-                    await supabase.auth.signOut();
-                }
+            if (profileError) {
+                console.error('Profile Error:', profileError.message);
+                errorMessage.textContent = 'Gagal mengambil data pengguna. Hubungi admin.';
+                await supabase.auth.signOut(); // Logout jika gagal ambil profil
+                return;
+            }
 
-            } catch (error) {
-                console.error('Unexpected Error:', error);
-                errorMessage.textContent = 'Terjadi kesalahan yang tidak terduga. Silakan coba lagi.';
-            } finally {
-                // --- Mengembalikan Tombol ke State Semula ---
-                loginButton.disabled = false;
-                loginSpinner.classList.add('hidden');
-                loginButtonText.textContent = 'Login';
+            // Arahkan pengguna berdasarkan rolenya
+            if (profile.role === 'guru') {
+                window.location.href = '/guru/dashboard-guru.html';
+            } else if (profile.role === 'siswa') {
+                window.location.href = '/siswa/dashboard-siswa.html';
+            } else {
+                errorMessage.textContent = 'Role tidak dikenali.';
+                await supabase.auth.signOut();
             }
         });
     </script>
     
+    <!-- ================================================== -->
+    <!-- SCRIPT BARU - UNTUK TOGGLE PASSWORD -->
+    <!-- ================================================== -->
     <script>
         const passwordInput = document.getElementById('password');
         const togglePasswordButton = document.getElementById('togglePassword');
@@ -143,8 +131,14 @@
         const eyeOffIcon = document.getElementById('eye-off-icon');
 
         togglePasswordButton.addEventListener('click', () => {
+            // Cek tipe input saat ini (apakah 'password' atau 'text')
             const isPassword = passwordInput.type === 'password';
+
+            // Ubah tipe inputnya
+            // Jika tipenya 'password', ubah jadi 'text'. Jika 'text', ubah jadi 'password'.
             passwordInput.type = isPassword ? 'text' : 'password';
+
+            // Ganti ikon yang ditampilkan
             eyeIcon.classList.toggle('hidden', isPassword);
             eyeOffIcon.classList.toggle('hidden', !isPassword);
         });
@@ -152,4 +146,3 @@
 
 </body>
 </html>
-
